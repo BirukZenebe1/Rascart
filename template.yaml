@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: merkatoAI backend on AWS Lambda + API Gateway (SAM)
+
+Parameters:
+  MongoUri:
+    Type: String
+    NoEcho: true
+    Description: MongoDB connection string
+  JwtSecretKey:
+    Type: String
+    NoEcho: true
+    Description: JWT secret key for Flask JWT
+  OpenAIApiKey:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: Optional OpenAI API key
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 1024
+    Environment:
+      Variables:
+        MONGO_URI: !Ref MongoUri
+        JWT_SECRET_KEY: !Ref JwtSecretKey
+        OPENAI_API_KEY: !Ref OpenAIApiKey
+
+Resources:
+  BackendApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - '*'
+
+  BackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: lambda_handler.lambda_handler
+      Architectures:
+        - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BackendApi
+            Path: /
+            Method: ANY
+        Proxy:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BackendApi
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Description: HTTP API endpoint URL
+    Value: !Sub 'https://${BackendApi}.execute-api.${AWS::Region}.amazonaws.com'

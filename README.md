@@ -46,3 +46,40 @@ You can host the React frontend on Netlify free tier and keep Flask API on Rende
 `netlify.toml` already includes:
 - SPA route fallback (`/* -> /index.html`)
 - API proxy (`/api/* -> https://merkato-ai.onrender.com/api/:splat`)
+
+# AWS Lambda Backend Deployment
+This repo is prepared to deploy the backend with:
+- AWS Lambda
+- API Gateway (HTTP API)
+- CloudWatch Logs
+- IAM role (created by SAM)
+
+Files added:
+- `template.yaml`
+- `samconfig.toml`
+- `backend/lambda_handler.py`
+
+## Prerequisites
+1. AWS CLI configured (`aws configure`)
+2. AWS SAM CLI installed
+3. Docker installed (for `sam build --use-container`)
+
+## Deploy
+From repo root:
+
+```bash
+sam build --use-container
+sam deploy \
+  --parameter-overrides \
+  MongoUri='YOUR_MONGO_URI' \
+  JwtSecretKey='YOUR_JWT_SECRET_KEY' \
+  OpenAIApiKey='YOUR_OPENAI_API_KEY_OR_EMPTY'
+```
+
+After deploy, SAM prints `ApiUrl` output.
+
+## Point frontend to AWS backend
+In Netlify environment variables, set:
+- `REACT_APP_API_BASE_URL=https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com`
+
+Then redeploy Netlify frontend.
