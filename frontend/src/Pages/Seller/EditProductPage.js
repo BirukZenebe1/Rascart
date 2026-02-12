@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../../config';
@@ -31,11 +31,7 @@ function EditProductPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const response = await axios.get(apiUrl(`/api/products/${id}`));
       const product = response.data.product || response.data;
@@ -64,7 +60,11 @@ function EditProductPage() {
       setError('Failed to fetch product');
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
