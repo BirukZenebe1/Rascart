@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext'; // Add this import at the top
 import ProductCard from '../components/ProductCard';
+import { apiUrl } from '../config';
 
 function ProductDetailPage() {
   const { id: productId } = useParams();
@@ -31,7 +32,7 @@ function ProductDetailPage() {
         
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         
-        const response = await axios.get(endpoint, { headers });
+        const response = await axios.get(apiUrl(endpoint), { headers });
         
         if (token) {
           setProduct(response.data.product);
@@ -57,7 +58,7 @@ function ProductDetailPage() {
 
       try {
         setSimilarLoading(true);
-        const response = await axios.get('/api/products/list?per_page=48&page=1');
+        const response = await axios.get(apiUrl('/api/products/list?per_page=48&page=1'));
         const candidates = (response.data.products || []).filter((item) => item._id !== product._id);
 
         const targetCategories = new Set(product.categories || []);

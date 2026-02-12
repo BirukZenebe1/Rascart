@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 function EditProductPage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ function EditProductPage() {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`/api/products/${id}`);
+      const response = await axios.get(apiUrl(`/api/products/${id}`));
       const product = response.data.product || response.data;
       
       setFormData({
@@ -161,7 +162,7 @@ function EditProductPage() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `/api/seller/products/${id}`,
+        apiUrl(`/api/seller/products/${id}`),
         payload,
         {
           headers: { Authorization: `Bearer ${token}` }

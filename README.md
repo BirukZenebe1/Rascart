@@ -31,3 +31,18 @@ Then in Render service settings:
 1. Open **Custom Domains**.
 2. Add your purchased domain.
 3. Point DNS records at Render targets shown in the dashboard.
+
+# Netlify Frontend (Free) + Render Backend
+You can host the React frontend on Netlify free tier and keep Flask API on Render.
+
+## Netlify setup
+1. Connect `BirukZenebe1/GebeyaAI` in Netlify.
+2. Netlify will use `netlify.toml` from repo root:
+   - Base: `frontend`
+   - Build: `npm run build`
+   - Publish: `frontend/build`
+3. Deploy.
+
+`netlify.toml` already includes:
+- SPA route fallback (`/* -> /index.html`)
+- API proxy (`/api/* -> https://merkato-ai.onrender.com/api/:splat`)

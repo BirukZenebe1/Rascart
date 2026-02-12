@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../config';
  
 const styleCategories = [
   {
@@ -117,7 +118,7 @@ function StyleQuestionnaire() {
       };
       // Send preferences to backend
       const response = await axios.post(
-        '/api/style/profile',
+        apiUrl('/api/style/profile'),
         { preferences: answers },
         config
       );

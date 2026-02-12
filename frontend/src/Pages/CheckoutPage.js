@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import axios from 'axios';
+import { apiUrl } from '../config';
 
 function CheckoutPage() {
   const { cartItems, getTotalPrice, clearCart } = useCart();
@@ -26,7 +27,7 @@ function CheckoutPage() {
         if (!token) {
           return;
         }
-        const response = await axios.get('/api/auth/profile', {
+        const response = await axios.get(apiUrl('/api/auth/profile'), {
           headers: { Authorization: `Bearer ${token}` }
         });
         const preferred = response.data?.user?.preferred_payment_method;

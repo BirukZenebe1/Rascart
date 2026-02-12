@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 function SellerProductsPage() {
   const [products, setProducts] = useState([]);
@@ -14,7 +15,7 @@ function SellerProductsPage() {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/seller/products', {
+      const response = await axios.get(apiUrl('/api/seller/products'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(response.data.products);
@@ -32,7 +33,7 @@ function SellerProductsPage() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/seller/products/${productId}`, {
+      await axios.delete(apiUrl(`/api/seller/products/${productId}`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -47,7 +48,7 @@ function SellerProductsPage() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `/api/seller/products/${productId}`,
+        apiUrl(`/api/seller/products/${productId}`),
         { is_active: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

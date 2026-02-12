@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import { API_BASE_URL, apiUrl } from '../config';
 
 function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
   const [uploading, setUploading] = useState(false);
@@ -44,7 +45,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
 
         const token = localStorage.getItem('token');
         const response = await axios.post(
-          '/api/auth/profile/photo',
+          apiUrl('/api/auth/profile/photo'),
           { image: base64String },
           {
             headers: { Authorization: `Bearer ${token}` }
@@ -74,7 +75,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete('/api/auth/profile/photo', {
+      await axios.delete(apiUrl('/api/auth/profile/photo'), {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -99,7 +100,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
         <div className="w-32 h-32 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-lg">
           {preview ? (
             <img
-              src={preview.startsWith('http') ? preview : `/api/auth${preview}`}
+              src={preview.startsWith('http') ? preview : `${API_BASE_URL || ''}/api/auth${preview}`}
               alt="Profile"
               className="w-full h-full object-cover"
             />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
+import { apiUrl } from '../config';
 
 // Removed unused 'useAuth' import
  
@@ -38,7 +39,7 @@ function StyleResultsPage() {
 
         try {
 
-          const response = await fetch('/api/style/profile', {
+          const response = await fetch(apiUrl('/api/style/profile'), {
 
             headers: {
 

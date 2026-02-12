@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 function AddProductPage() {
   const navigate = useNavigate();
@@ -128,7 +129,7 @@ function AddProductPage() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        '/api/seller/products',
+        apiUrl('/api/seller/products'),
         payload,
         {
           headers: { Authorization: `Bearer ${token}` }

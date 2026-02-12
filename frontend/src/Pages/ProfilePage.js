@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProfilePhotoUpload from '../components/ProfilePhotoUpload';
 import { useNavigate, Link } from 'react-router-dom';
+import { apiUrl } from '../config';
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function ProfilePage() {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/auth/profile', {
+      const response = await axios.get(apiUrl('/api/auth/profile'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(response.data.user);
@@ -49,7 +50,7 @@ function ProfilePage() {
         preferred_payment_method: user.preferred_payment_method || ''
       };
 
-      const response = await axios.put('/api/auth/profile', payload, {
+      const response = await axios.put(apiUrl('/api/auth/profile'), payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

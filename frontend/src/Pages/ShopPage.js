@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import axios from 'axios';
+import { apiUrl } from '../config';
 
 function ShopPage() {
   const [products, setProducts] = useState([]);
@@ -73,7 +74,7 @@ function ShopPage() {
         navigate(`/shop?${params.toString()}`, { replace: true });
         
         // Fetch products
-        const response = await axios.get(`/api/products/list?${params.toString()}`);
+        const response = await axios.get(apiUrl(`/api/products/list?${params.toString()}`));
         
         setProducts(response.data.products);
         setTotalPages(response.data.total_pages);
@@ -92,7 +93,7 @@ function ShopPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/products/categories');
+        const response = await axios.get(apiUrl('/api/products/categories'));
         setCategories(response.data.categories);
       } catch (err) {
         console.error('Failed to fetch categories:', err);

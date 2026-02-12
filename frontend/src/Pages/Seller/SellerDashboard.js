@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 function SellerDashboard() {
   const [stats, setStats] = useState(null);
@@ -14,7 +15,7 @@ function SellerDashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/seller/stats', {
+      const response = await axios.get(apiUrl('/api/seller/stats'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(response.data);
