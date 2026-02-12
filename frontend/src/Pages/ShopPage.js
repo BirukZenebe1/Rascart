@@ -193,7 +193,7 @@ function ShopPage() {
           <div className="absolute -bottom-12 -left-10 h-36 w-36 rounded-full bg-indigo-200/40 blur-2xl" />
           <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] font-semibold text-cyan-700 mb-2">Gebeya AI Curated</p>
+              <p className="text-xs uppercase tracking-[0.25em] font-semibold text-cyan-700 mb-2">merkatoAI Curated</p>
               <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Shop smarter, look sharper</h1>
               <p className="text-slate-600 mt-2">Browse style picks tailored for your vibe and budget.</p>
             </div>

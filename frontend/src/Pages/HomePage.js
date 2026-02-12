@@ -11,12 +11,12 @@ function HomePage() {
           <div className="absolute -top-16 -right-10 h-48 w-48 rounded-full bg-cyan-200/50 blur-2xl" />
           <div className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-indigo-200/40 blur-2xl" />
           <div className="relative">
-            <p className="text-xs uppercase tracking-[0.24em] text-cyan-700 font-bold mb-3">Gebeya AI Shopping</p>
-            <h1 className="text-4xl md:text-5xl font-black mb-4 text-slate-900">Welcome to Gebeya AI</h1>
+            <p className="text-xs uppercase tracking-[0.24em] text-cyan-700 font-bold mb-3">merkatoAI Shopping</p>
+            <h1 className="text-4xl md:text-5xl font-black mb-4 text-slate-900">Welcome to merkatoAI</h1>
             <p className="text-lg md:text-xl mb-8 text-slate-600">Discover products tailored to your unique style</p>
             <Link
               to={isLoggedIn ? '/shop' : '/login'}
-              state={isLoggedIn ? undefined : { from: '/shop', message: 'Please login to explore Gebeya AI shop.' }}
+              state={isLoggedIn ? undefined : { from: '/shop', message: 'Please login to explore merkatoAI shop.' }}
               className="inline-flex bg-slate-900 text-white px-6 py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
             >
               Explore Shop

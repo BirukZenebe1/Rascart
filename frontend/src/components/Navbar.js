@@ -24,8 +24,8 @@ function Navbar() {
     <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/85 border-b border-slate-200 shadow-sm">
       <div className="container mx-auto px-4 py-4 flex flex-wrap gap-3 justify-between items-center">
         <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tight text-slate-900">
-          <img src={basketLogo} alt="Gebeya AI logo" className="h-8 w-8" />
-          <span>Gebeya <span className="text-cyan-600">AI</span></span>
+          <img src={basketLogo} alt="merkatoAI logo" className="h-8 w-8" />
+          <span>merkato<span className="text-cyan-600">AI</span></span>
         </Link>
         <div className="flex items-center flex-wrap gap-x-5 gap-y-2">
           {state.isLoggedIn ? (
