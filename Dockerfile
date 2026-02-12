@@ -19,4 +19,4 @@ COPY backend/ /app/backend/
 COPY --from=frontend-build /app/frontend/build /app/frontend/build
 
 EXPOSE 10000
-CMD ["gunicorn", "--chdir", "backend", "--bind", "0.0.0.0:10000", "app:app"]
+CMD ["sh", "-c", "gunicorn --chdir backend --bind 0.0.0.0:${PORT:-10000} app:app"]
