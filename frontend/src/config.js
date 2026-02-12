@@ -1,4 +1,8 @@
-export const API_BASE_URL = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+const envApiBase = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+const isNetlifyHost = typeof window !== 'undefined' && window.location.hostname.includes('netlify.app');
+const fallbackApiBase = isNetlifyHost ? 'https://merkato-ai.onrender.com' : '';
+
+export const API_BASE_URL = envApiBase || fallbackApiBase;
 
 export const apiUrl = (path) => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
