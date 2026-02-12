@@ -36,7 +36,7 @@ function EditProductPage() {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/products/${id}`);
+      const response = await axios.get(`/api/products/${id}`);
       const product = response.data.product || response.data;
       
       setFormData({
@@ -161,7 +161,7 @@ function EditProductPage() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5001/api/seller/products/${id}`,
+        `/api/seller/products/${id}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` }

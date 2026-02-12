@@ -9,7 +9,7 @@ from models import create_product, create_seller_profile
 # Initialize blueprint
 seller_bp = Blueprint('seller', __name__)
 
-def save_product_image(base64_string, filename_prefix='product', host_url='http://localhost:5001/'):
+def save_product_image(base64_string, filename_prefix='product', host_url=''):
     try:
         upload_folder = os.path.join(os.path.dirname(__file__), 'uploads', 'products')
         os.makedirs(upload_folder, exist_ok=True)

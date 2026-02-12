@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
@@ -11,7 +11,8 @@ from datetime import timedelta
 load_dotenv()
 
 # Initialize Flask app
-app = Flask(__name__)
+frontend_build_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'build')
+app = Flask(__name__, static_folder=frontend_build_dir, static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
 # Configure MongoDB
@@ -74,6 +75,24 @@ def db_test():
             "details": str(e)
         }), 500
 
+# Serve React frontend when built
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    if path.startswith('api/'):
+        return jsonify({"error": "API route not found"}), 404
+
+    # Serve static asset if it exists in build directory.
+    target_path = os.path.join(frontend_build_dir, path)
+    if path and os.path.exists(target_path):
+        return send_from_directory(frontend_build_dir, path)
+
+    index_path = os.path.join(frontend_build_dir, 'index.html')
+    if os.path.exists(index_path):
+        return send_from_directory(frontend_build_dir, 'index.html')
+
+    return jsonify({"message": "Frontend build not found. Build the frontend to serve UI."}), 404
+
 # Start the server
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=int(os.environ.get("PORT", 5001)))

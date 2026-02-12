@@ -14,7 +14,7 @@ function SellerDashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5001/api/seller/stats', {
+      const response = await axios.get('/api/seller/stats', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(response.data);

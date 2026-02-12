@@ -73,7 +73,7 @@ function ShopPage() {
         navigate(`/shop?${params.toString()}`, { replace: true });
         
         // Fetch products
-        const response = await axios.get(`http://localhost:5001/api/products/list?${params.toString()}`);
+        const response = await axios.get(`/api/products/list?${params.toString()}`);
         
         setProducts(response.data.products);
         setTotalPages(response.data.total_pages);
@@ -92,7 +92,7 @@ function ShopPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/products/categories');
+        const response = await axios.get('/api/products/categories');
         setCategories(response.data.categories);
       } catch (err) {
         console.error('Failed to fetch categories:', err);
@@ -192,7 +192,7 @@ function ShopPage() {
           <div className="absolute -bottom-12 -left-10 h-36 w-36 rounded-full bg-indigo-200/40 blur-2xl" />
           <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] font-semibold text-cyan-700 mb-2">GebeyaAI Curated</p>
+              <p className="text-xs uppercase tracking-[0.25em] font-semibold text-cyan-700 mb-2">Gebeya AI Curated</p>
               <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Shop smarter, look sharper</h1>
               <p className="text-slate-600 mt-2">Browse style picks tailored for your vibe and budget.</p>
             </div>
@@ -209,7 +209,7 @@ function ShopPage() {
 
         <div className="flex flex-col lg:flex-row gap-6">
         {/* Filters Sidebar */}
-        <div className="w-full lg:w-1/4 lg:sticky lg:top-24 h-fit bg-white p-5 rounded-2xl border border-slate-200 shadow-lg">
+        <div className="w-full lg:w-[320px] lg:shrink-0 lg:sticky lg:top-24 h-fit bg-white p-5 rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-slate-900">Filters</h2>
             {activeFilterCount > 0 && (
@@ -222,13 +222,13 @@ function ShopPage() {
           {/* Search */}
           <form onSubmit={handleSearch} className="mb-6">
             <label className="block text-sm font-semibold text-slate-700 mb-2">Search</label>
-            <div className="flex">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto]">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="flex-grow px-3 py-2 border border-slate-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full min-w-0 px-3 py-2 border border-slate-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <button
                 type="submit"
@@ -259,20 +259,20 @@ function ShopPage() {
           {/* Price Range */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-slate-700 mb-2">Price Range</label>
-            <div className="flex space-x-2">
+            <div className="space-y-2">
               <input
                 type="number"
                 value={priceRange.min}
                 onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
                 placeholder="Min"
-                className="w-1/2 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full min-w-0 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <input
                 type="number"
                 value={priceRange.max}
                 onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
                 placeholder="Max"
-                className="w-1/2 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full min-w-0 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
           </div>
@@ -280,11 +280,11 @@ function ShopPage() {
           {/* Sort By */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-slate-700 mb-2">Sort By</label>
-            <div className="flex space-x-2">
+            <div className="space-y-2">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-2/3 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full min-w-0 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               >
                 <option value="price">Price</option>
                 <option value="name">Name</option>
@@ -293,7 +293,7 @@ function ShopPage() {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="w-1/3 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full min-w-0 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               >
                 <option value="asc">Asc</option>
                 <option value="desc">Desc</option>
@@ -319,7 +319,7 @@ function ShopPage() {
         </div>
         
         {/* Product Grid */}
-        <div className="w-full lg:w-3/4">
+        <div className="w-full min-w-0 flex-1">
           {products.length === 0 ? (
             <div className="bg-white border border-slate-200 p-10 rounded-2xl text-center shadow-lg">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-100 text-slate-700 mb-4 text-2xl">

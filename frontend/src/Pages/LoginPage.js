@@ -11,6 +11,7 @@ function LoginPage() {
   const location = useLocation();
 
   const message = location.state?.message;
+  const redirectPath = location.state?.from || '/shop';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/login', {
+      const response = await axios.post('/api/auth/login', {
         email,
         password
       });
@@ -39,7 +40,7 @@ function LoginPage() {
         if (response.data.user_type === 'seller') {
           navigate('/seller/dashboard');
         } else {
-          navigate('/');
+          navigate(redirectPath);
         }
       }
     } catch (err) {

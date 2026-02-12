@@ -59,17 +59,23 @@ def create_or_update_profile():
             )
             result = style_bp.mongo.db.style_profiles.insert_one(new_profile)
             profile_id = result.inserted_id
-            
-            # Update user document with style profile reference
-            style_bp.mongo.db.users.update_one(
-                {'_id': ObjectId(current_user_id)},
-                {'$set': {'style_profile': profile_id}}
-            )
+
+        # Update user personalization flags and style profile reference
+        style_bp.mongo.db.users.update_one(
+            {'_id': ObjectId(current_user_id)},
+            {'$set': {
+                'style_profile': profile_id,
+                'personalization_state': 'personalized',
+                'is_personalized': True
+            }}
+        )
         
         return jsonify({
             "message": "Style profile saved successfully",
             "profile_id": str(profile_id),
-            "ai_analysis": mock_analysis
+            "ai_analysis": mock_analysis,
+            "personalization_state": "personalized",
+            "is_personalized": True
         }), 200
         
     except Exception as e:
@@ -302,7 +308,11 @@ def test_profile_creation():
         # Update user document
         style_bp.mongo.db.users.update_one(
             {'_id': ObjectId(current_user_id)},
-            {'$set': {'style_profile': profile_id}}
+            {'$set': {
+                'style_profile': profile_id,
+                'personalization_state': 'personalized',
+                'is_personalized': True
+            }}
         )
         
         return jsonify({

@@ -84,7 +84,7 @@ function StyleQuestionnaire() {
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const { token } = useAuth();
+  const { token, refreshUser, setUser } = useAuth();
   const navigate = useNavigate();
  
   const handleAnswer = (value) => {
@@ -117,15 +117,26 @@ function StyleQuestionnaire() {
       };
       // Send preferences to backend
       const response = await axios.post(
-        'http://localhost:5001/api/style/profile',
+        '/api/style/profile',
         { preferences: answers },
         config
       );
+
+      // Ensure auth context reflects latest persisted personalization state.
+      const updatedUser = await refreshUser(token);
+      if (!updatedUser) {
+        setUser((prevUser) => ({
+          ...prevUser,
+          personalization_state: 'personalized',
+          is_personalized: true
+        }));
+      }
       // Redirect to profile or results page
       navigate('/style-results', { 
         state: { 
           analysis: response.data.ai_analysis,
-          preferences: answers
+          preferences: answers,
+          personalization_state: response.data.personalization_state || 'personalized'
         } 
       });
     } catch (err) {

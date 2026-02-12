@@ -117,6 +117,76 @@ def profile():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Update current user profile
+@auth_bp.route('/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    try:
+        current_user_id = get_jwt_identity()
+        data = request.get_json() or {}
+        user_id = ObjectId(current_user_id)
+
+        user = auth_bp.mongo.db.users.find_one({'_id': user_id})
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        updates = {}
+
+        if 'username' in data:
+            username = (data.get('username') or '').strip()
+            if not username:
+                return jsonify({"error": "Username cannot be empty"}), 400
+            existing_username = auth_bp.mongo.db.users.find_one({
+                'username': username,
+                '_id': {'$ne': user_id}
+            })
+            if existing_username:
+                return jsonify({"error": "Username already taken"}), 409
+            updates['username'] = username
+
+        if 'email' in data:
+            email = (data.get('email') or '').strip().lower()
+            if not email:
+                return jsonify({"error": "Email cannot be empty"}), 400
+            existing_email = auth_bp.mongo.db.users.find_one({
+                'email': email,
+                '_id': {'$ne': user_id}
+            })
+            if existing_email:
+                return jsonify({"error": "Email already registered"}), 409
+            updates['email'] = email
+
+        if 'preferred_payment_method' in data:
+            payment_method = (data.get('preferred_payment_method') or '').strip()
+            allowed_methods = ['card', 'bank_transfer', 'mobile_money', 'cash_on_delivery', 'paypal']
+            if payment_method and payment_method not in allowed_methods:
+                return jsonify({"error": "Invalid payment method"}), 400
+            updates['preferred_payment_method'] = payment_method
+
+        if not updates:
+            return jsonify({"error": "No valid fields to update"}), 400
+
+        auth_bp.mongo.db.users.update_one({'_id': user_id}, {'$set': updates})
+
+        updated_user = auth_bp.mongo.db.users.find_one({'_id': user_id})
+        updated_user.pop('password', None)
+        updated_user['_id'] = str(updated_user['_id'])
+
+        if updated_user.get('seller_profile'):
+            updated_user['seller_profile'] = str(updated_user['seller_profile'])
+        if updated_user.get('style_profile'):
+            updated_user['style_profile'] = str(updated_user['style_profile'])
+        if 'created_at' in updated_user:
+            updated_user['created_at'] = updated_user['created_at'].isoformat()
+
+        return jsonify({
+            "message": "Profile updated successfully",
+            "user": updated_user
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # Upload profile photo
 @auth_bp.route('/profile/photo', methods=['POST'])
 @jwt_required()

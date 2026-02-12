@@ -5,6 +5,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-ai: #0891b2;
+  --brand-ai-hover: #0e7490;
+  --brand-ai-soft: #cffafe;
+}
+
 /* Keep the existing CSS below */
 body {
   margin: 0;
@@ -25,4 +31,27 @@ code {
 }
 nav + nav {
   display: none !important;
+}
+
+button[class*="bg-slate-900"],
+button[class*="bg-blue-600"],
+button[class*="bg-blue-500"],
+button[class*="bg-emerald-600"],
+a[class*="bg-slate-900"],
+a[class*="bg-blue-600"],
+a[class*="bg-blue-500"],
+a[class*="bg-emerald-600"] {
+  background-color: var(--brand-ai) !important;
+  color: #ffffff !important;
+}
+
+button[class*="bg-slate-900"]:hover,
+button[class*="bg-blue-600"]:hover,
+button[class*="bg-blue-500"]:hover,
+button[class*="bg-emerald-600"]:hover,
+a[class*="bg-slate-900"]:hover,
+a[class*="bg-blue-600"]:hover,
+a[class*="bg-blue-500"]:hover,
+a[class*="bg-emerald-600"]:hover {
+  background-color: var(--brand-ai-hover) !important;
 }

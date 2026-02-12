@@ -13,23 +13,48 @@ import AddProductPage from './Pages/Seller/AddProductPage';
 import EditProductPage from './Pages/Seller/EditProductPage';
 import SellerProductsPage from './Pages/Seller/SellerProductsPage';
 import SellerRoute from './components/SellerRoute';
+import PrivateRoute from './components/PrivateRoute';
 import Footer from './components/Footer';
 import AboutPage from './Pages/AboutPage';
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import StyleResultsPage from './Pages/StyleResultsPage';
+import StyleQuestionnaire from './components/StyleQuestionnaire';
 
 function App() {
   return (
     <Router>
-      <div className="App min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1">
-          <Routes>
+      <AuthProvider>
+        <CartProvider>
+          <div className="App min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
-            <Route path="/shop" element={<ShopPage />} />
-            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/shop" element={
+              <PrivateRoute>
+                <ShopPage />
+              </PrivateRoute>
+            } />
+            <Route path="/product/:id" element={
+              <PrivateRoute>
+                <ProductDetailPage />
+              </PrivateRoute>
+            } />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/style-questionnaire" element={
+              <PrivateRoute>
+                <StyleQuestionnaire />
+              </PrivateRoute>
+            } />
+            <Route path="/style-results" element={
+              <PrivateRoute>
+                <StyleResultsPage />
+              </PrivateRoute>
+            } />
             
             {/* Buyer Routes */}
             <Route path="/cart" element={<CartPage />} />
@@ -56,10 +81,17 @@ function App() {
                 <EditProductPage />
               </SellerRoute>
             } />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+            <Route path="/seller/profile" element={
+              <SellerRoute>
+                <ProfilePage />
+              </SellerRoute>
+            } />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }

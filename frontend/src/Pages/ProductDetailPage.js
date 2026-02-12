@@ -3,17 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext'; // Add this import at the top
+import ProductCard from '../components/ProductCard';
 
 function ProductDetailPage() {
   const { id: productId } = useParams();
-  const { token} = useAuth();
+  const auth = useAuth();
+  const token = auth?.token || localStorage.getItem('token');
   const navigate = useNavigate();
-  const { addToCart } = useCart(); // Add this near other hook calls
+  const cart = useCart();
   const [product, setProduct] = useState(null);
   const [styleMatch, setStyleMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [similarProducts, setSimilarProducts] = useState([]);
+  const [similarLoading, setSimilarLoading] = useState(false);
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -22,8 +26,8 @@ function ProductDetailPage() {
         
         // Determine which endpoint to use based on authentication
         const endpoint = token 
-          ? `http://localhost:5001/api/products/${productId}/with-style-match`
-          : `http://localhost:5001/api/products/${productId}`;
+          ? `/api/products/${productId}/with-style-match`
+          : `/api/products/${productId}`;
         
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         
@@ -46,6 +50,60 @@ function ProductDetailPage() {
     
     fetchProduct();
   }, [productId, token]);
+
+  useEffect(() => {
+    const fetchSimilarProducts = async () => {
+      if (!product || !product._id) return;
+
+      try {
+        setSimilarLoading(true);
+        const response = await axios.get('/api/products/list?per_page=48&page=1');
+        const candidates = (response.data.products || []).filter((item) => item._id !== product._id);
+
+        const targetCategories = new Set(product.categories || []);
+        const targetType = (product.product_type || '').toLowerCase();
+        const targetColor = (product.attributes?.color || '').toLowerCase();
+        const targetMaterial = (product.attributes?.material || '').toLowerCase();
+        const targetPrice = Number(product.price || 0);
+
+        const scored = candidates.map((item) => {
+          let score = 0;
+          const categories = item.categories || [];
+          const sharedCategories = categories.filter((c) => targetCategories.has(c)).length;
+          score += sharedCategories * 3;
+
+          if ((item.product_type || '').toLowerCase() === targetType && targetType) {
+            score += 4;
+          }
+          if ((item.attributes?.color || '').toLowerCase() === targetColor && targetColor) {
+            score += 2;
+          }
+          if ((item.attributes?.material || '').toLowerCase() === targetMaterial && targetMaterial) {
+            score += 2;
+          }
+
+          const itemPrice = Number(item.price || 0);
+          const priceDiff = Math.abs(itemPrice - targetPrice);
+          score += Math.max(0, 3 - priceDiff / 25);
+
+          return { ...item, __score: score };
+        });
+
+        const topSimilar = scored
+          .sort((a, b) => b.__score - a.__score)
+          .slice(0, 4);
+
+        setSimilarProducts(topSimilar);
+      } catch (err) {
+        console.error('Failed to fetch similar products:', err);
+        setSimilarProducts([]);
+      } finally {
+        setSimilarLoading(false);
+      }
+    };
+
+    fetchSimilarProducts();
+  }, [product]);
   
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -55,7 +113,21 @@ function ProductDetailPage() {
   };
   
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    if (cart?.addToCart) {
+      cart.addToCart(product, quantity);
+    } else {
+      const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existingItemIndex = savedCart.findIndex((item) => item._id === product._id);
+      if (existingItemIndex !== -1) {
+        savedCart[existingItemIndex] = {
+          ...savedCart[existingItemIndex],
+          quantity: (savedCart[existingItemIndex].quantity || 0) + quantity
+        };
+      } else {
+        savedCart.push({ ...product, quantity });
+      }
+      localStorage.setItem('cart', JSON.stringify(savedCart));
+    }
     alert(`Added ${quantity} of ${product.name} to cart`);
   };
   
@@ -166,6 +238,32 @@ function ProductDetailPage() {
               </ul>
             </div>
           )}
+
+          {(product.product_type || product.preferred_contact || product.payment_method) && (
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold text-slate-900">Seller Info</h2>
+              <ul className="mt-2 space-y-1">
+                {product.product_type && (
+                  <li className="flex">
+                    <span className="font-medium w-32">Type:</span>
+                    <span className="text-slate-600">{product.product_type}</span>
+                  </li>
+                )}
+                {product.preferred_contact && (
+                  <li className="flex">
+                    <span className="font-medium w-32">Contact:</span>
+                    <span className="text-slate-600">{product.preferred_contact}</span>
+                  </li>
+                )}
+                {product.payment_method && (
+                  <li className="flex">
+                    <span className="font-medium w-32">Payment:</span>
+                    <span className="text-slate-600">{product.payment_method}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
           
           {/* Quantity Selector */}
           <div className="mt-8">
@@ -210,6 +308,29 @@ function ProductDetailPage() {
           </button>
         </div>
       </div>
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-slate-900">AI Similar Picks</h2>
+            <span className="text-sm text-slate-500">Based on style, type, and price</span>
+          </div>
+
+          {similarLoading ? (
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-600 mx-auto"></div>
+              <p className="text-slate-500 mt-3">Analyzing similar products...</p>
+            </div>
+          ) : similarProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarProducts.map((item) => (
+                <ProductCard key={item._id} product={item} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500">
+              No similar products found yet.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

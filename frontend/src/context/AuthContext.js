@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,8 +12,28 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const refreshUser = useCallback(async (authToken = token, throwOnError = false) => {
+    if (!authToken) {
+      setUser(null);
+      return null;
+    }
+
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+      const response = await axios.get('/api/auth/profile');
+      setUser(response.data.user);
+      return response.data.user;
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
+    }
+  }, [token]);
+
    // Logout function
-  const logout = () => {
+  const logout = useCallback(() => {
     // Remove token from local storage
     localStorage.removeItem('token');
     
@@ -26,19 +46,14 @@ export const AuthProvider = ({ children }) => {
     
     // Redirect to login page
     navigate('/login');
-  };
+  }, [navigate]);
 
   // Check if user is authenticated on initial load
   useEffect(() => {
     const checkAuth = async () => {
       if (token) {
         try {
-          // Set axios default headers
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
-          // Get user profile
-          const response = await axios.get('http://localhost:5001/api/auth/profile');
-          setUser(response.data.user);
+          await refreshUser(token, true);
         } catch (error) {
           console.error('Auth check failed:', error);
           // Don't immediately logout on first error
@@ -52,12 +67,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuth();
-  }, [token]);
+  }, [token, logout, refreshUser]);
 
   // Register function
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/register', userData);
+      const response = await axios.post('/api/auth/register', userData);
       return { success: true, data: response.data };
     } catch (error) {
       return { 
@@ -70,7 +85,7 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (credentials) => {
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/login', credentials);
+      const response = await axios.post('/api/auth/login', credentials);
       const { token, user_id, username, email } = response.data;
       
       // Save token to local storage
@@ -104,7 +119,7 @@ export const AuthProvider = ({ children }) => {
  
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, register, login, logout, refreshUser, setUser }}>
       {children}
     </AuthContext.Provider>
   );

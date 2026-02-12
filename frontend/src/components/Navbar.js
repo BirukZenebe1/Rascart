@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import basketLogo from '../assets/gebeya-basket-logo.svg';
 
 function Navbar() {
-  const navigate = useNavigate();
   const location = useLocation();
   
   const [state, setState] = useState({
@@ -20,17 +20,12 @@ function Navbar() {
     });
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setState({ isLoggedIn: false, username: '', userType: '' });
-    navigate('/');
-  };
-
   return (
     <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/85 border-b border-slate-200 shadow-sm">
       <div className="container mx-auto px-4 py-4 flex flex-wrap gap-3 justify-between items-center">
-        <Link to="/" className="text-2xl font-black tracking-tight text-slate-900">
-          Gebeya<span className="text-cyan-600">AI</span>
+        <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tight text-slate-900">
+          <img src={basketLogo} alt="Gebeya AI logo" className="h-8 w-8" />
+          <span>Gebeya <span className="text-cyan-600">AI</span></span>
         </Link>
         <div className="flex items-center flex-wrap gap-x-5 gap-y-2">
           {state.isLoggedIn ? (
@@ -50,11 +45,16 @@ function Navbar() {
               )}
               <span className="text-sm text-slate-700">Welcome, <b>{state.username}</b></span>
               <span className="text-xs px-2 py-1 bg-cyan-100 text-cyan-800 rounded-full font-semibold">{state.userType === 'seller' ? 'Seller' : 'Customer'}</span>
-              <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/shop" className="text-slate-700 hover:text-cyan-700 font-medium">Shop</Link>
+              <Link
+                to="/login"
+                state={{ from: '/shop', message: 'Please login first to continue.' }}
+                className="text-slate-700 hover:text-cyan-700 font-medium"
+              >
+                Shop
+              </Link>
               <Link to="/about" className="text-slate-700 hover:text-cyan-700 font-medium">About</Link>
               <Link to="/login" className="text-slate-700 hover:text-cyan-700 font-medium">Login</Link>
               <Link to="/register" className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors">Register</Link>

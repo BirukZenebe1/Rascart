@@ -5,7 +5,7 @@ const ProductCard = ({ product }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <img 
-        src={product.imageUrl} 
+        src={product.imageUrl || product.image_url || 'https://placehold.co/600x400/e2e8f0/1e40af?text=Product'} 
         alt={product.name}
         className="w-full h-52 object-cover rounded-xl"
       />
@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
         <p className="text-cyan-700 font-semibold mt-1">${product.price}</p>
         <div className="mt-4">
           <Link 
-            to={`/product/${product._id}`}
+            to={`/product/${product._id || product.id}`}
             className="inline-flex items-center bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition-colors"
           >
             View Details

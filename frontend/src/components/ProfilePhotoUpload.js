@@ -44,7 +44,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
 
         const token = localStorage.getItem('token');
         const response = await axios.post(
-          'http://localhost:5001/api/auth/profile/photo',
+          '/api/auth/profile/photo',
           { image: base64String },
           {
             headers: { Authorization: `Bearer ${token}` }
@@ -74,7 +74,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete('http://localhost:5001/api/auth/profile/photo', {
+      await axios.delete('/api/auth/profile/photo', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -96,10 +96,10 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
     <div className="flex flex-col items-center">
       {/* Profile Photo Display */}
       <div className="relative">
-        <div className="w-32 h-32 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-lg">
+        <div className="w-32 h-32 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-lg">
           {preview ? (
             <img
-              src={preview.startsWith('http') ? preview : `http://localhost:5001${preview}`}
+              src={preview.startsWith('http') ? preview : `/api/auth${preview}`}
               alt="Profile"
               className="w-full h-full object-cover"
             />
@@ -112,7 +112,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
         <button
           onClick={triggerFileInput}
           disabled={uploading}
-          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700 disabled:opacity-50"
+          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-cyan-600 text-white flex items-center justify-center shadow-lg hover:bg-cyan-700 disabled:opacity-50"
           title="Change photo"
         >
           {uploading ? (
@@ -140,7 +140,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
         <button
           onClick={triggerFileInput}
           disabled={uploading}
-          className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50"
+          className="text-sm text-cyan-700 hover:text-cyan-900 disabled:opacity-50 font-semibold"
         >
           {preview ? 'Change Photo' : 'Upload Photo'}
         </button>

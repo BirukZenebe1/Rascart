@@ -1,0 +1,14 @@
+<svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="basketGrad" x1="12" y1="14" x2="58" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#0891B2"/>
+    </linearGradient>
+  </defs>
+  <path d="M20 28C20 19.1634 27.1634 12 36 12C44.8366 12 52 19.1634 52 28" stroke="url(#basketGrad)" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M14 28H58L53.5 57C53.2 59 51.4 60.5 49.4 60.5H22.6C20.6 60.5 18.8 59 18.5 57L14 28Z" fill="#E2E8F0" stroke="#0F172A" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M24 39H48" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M22 47H50" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="51.5" cy="17.5" r="5.5" fill="#22D3EE"/>
+  <path d="M51.5 14.7V20.3M48.7 17.5H54.3" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

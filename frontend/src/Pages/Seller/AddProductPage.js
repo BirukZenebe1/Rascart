@@ -128,7 +128,7 @@ function AddProductPage() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5001/api/seller/products',
+        '/api/seller/products',
         payload,
         {
           headers: { Authorization: `Bearer ${token}` }
