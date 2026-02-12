@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext'; // Add this import at the top
 
 function ProductDetailPage() {
-  const { productId } = useParams();
+  const { id: productId } = useParams();
   const { token} = useAuth();
   const navigate = useNavigate();
   const { addToCart } = useCart(); // Add this near other hook calls
@@ -61,9 +61,11 @@ function ProductDetailPage() {
   
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+        <div className="container mx-auto px-4 py-10">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-600"></div>
+          </div>
         </div>
       </div>
     );
@@ -71,43 +73,46 @@ function ProductDetailPage() {
   
   if (error || !product) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error || 'Product not found'}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+        <div className="container mx-auto px-4 py-10">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+            {error || 'Product not found'}
+          </div>
+          <button 
+            onClick={() => navigate('/shop')}
+            className="mt-4 bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800"
+          >
+            Back to Shop
+          </button>
         </div>
-        <button 
-          onClick={() => navigate('/shop')}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Back to Shop
-        </button>
       </div>
     );
   }
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+      <div className="container mx-auto px-4 py-10">
+        <div className="flex flex-col lg:flex-row gap-8">
         {/* Product Image */}
-        <div className="md:w-1/2">
-          <div className="bg-gray-100 rounded-lg overflow-hidden">
+        <div className="lg:w-1/2">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <img 
-              src={`https://placehold.co/600x400/e2e8f0/1e40af?text=${encodeURIComponent(product.name.split(' ')[0])}`}
+              src={product.imageUrl || product.image_url || `https://placehold.co/600x400/e2e8f0/1e40af?text=${encodeURIComponent(product.name.split(' ')[0])}`}
               alt={product.name}
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover min-h-[360px]"
             />
           </div>
         </div>
         
         {/* Product Details */}
-        <div className="md:w-1/2">
+        <div className="lg:w-1/2 bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
           {/* Style Match Indicator (if available) */}
           {styleMatch && styleMatch.has_style_profile && (
             <div className={`mb-4 p-3 rounded-lg ${
-              styleMatch.match_score > 75 ? 'bg-green-100 text-green-800' :
-              styleMatch.match_score > 50 ? 'bg-blue-100 text-blue-800' :
-              styleMatch.match_score > 25 ? 'bg-yellow-100 text-yellow-800' :
-              'bg-gray-100 text-gray-800'
+              styleMatch.match_score > 75 ? 'bg-emerald-100 text-emerald-800' :
+              styleMatch.match_score > 50 ? 'bg-cyan-100 text-cyan-800' :
+              styleMatch.match_score > 25 ? 'bg-amber-100 text-amber-800' :
+              'bg-slate-100 text-slate-800'
             }`}>
               <div className="flex items-center justify-between">
                 <span className="font-medium">Style Match</span>
@@ -129,13 +134,13 @@ function ProductDetailPage() {
           )}
           
           {/* Product Name and Price */}
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="text-2xl font-bold text-blue-600 mt-2">${product.price.toFixed(2)}</p>
+          <h1 className="text-3xl font-black text-slate-900">{product.name}</h1>
+          <p className="text-2xl font-bold text-cyan-700 mt-2">${Number(product.price).toFixed(2)}</p>
           
           {/* Categories */}
           <div className="flex flex-wrap gap-2 mt-4">
             {product.categories && product.categories.map((category, index) => (
-              <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+              <span key={index} className="bg-cyan-100 text-cyan-800 text-xs px-2 py-1 rounded-full font-medium">
                 {category}
               </span>
             ))}
@@ -143,19 +148,19 @@ function ProductDetailPage() {
           
           {/* Description */}
           <div className="mt-6">
-            <h2 className="text-lg font-semibold">Description</h2>
-            <p className="mt-2 text-gray-600">{product.description}</p>
+            <h2 className="text-lg font-semibold text-slate-900">Description</h2>
+            <p className="mt-2 text-slate-600">{product.description}</p>
           </div>
           
           {/* Attributes */}
           {product.attributes && Object.keys(product.attributes).length > 0 && (
             <div className="mt-6">
-              <h2 className="text-lg font-semibold">Details</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Details</h2>
               <ul className="mt-2 space-y-1">
                 {Object.entries(product.attributes).map(([key, value]) => (
                   <li key={key} className="flex">
                     <span className="font-medium w-24 capitalize">{key}:</span>
-                    <span className="text-gray-600 capitalize">{value}</span>
+                    <span className="text-slate-600 capitalize">{value}</span>
                   </li>
                 ))}
               </ul>
@@ -164,11 +169,11 @@ function ProductDetailPage() {
           
           {/* Quantity Selector */}
           <div className="mt-8">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
             <div className="flex items-center">
               <button 
                 onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                className="bg-gray-200 px-3 py-1 rounded-l"
+                className="bg-slate-100 border border-slate-300 px-3 py-1 rounded-l-md"
               >
                 -
               </button>
@@ -177,11 +182,11 @@ function ProductDetailPage() {
                 min="1"
                 value={quantity}
                 onChange={handleQuantityChange}
-                className="w-16 text-center border-t border-b border-gray-200 py-1"
+                className="w-16 text-center border-t border-b border-slate-300 py-1"
               />
               <button 
                 onClick={() => setQuantity(quantity + 1)}
-                className="bg-gray-200 px-3 py-1 rounded-r"
+                className="bg-slate-100 border border-slate-300 px-3 py-1 rounded-r-md"
               >
                 +
               </button>
@@ -191,7 +196,7 @@ function ProductDetailPage() {
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
-            className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="mt-6 w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
           >
             Add to Cart
           </button>
@@ -199,11 +204,12 @@ function ProductDetailPage() {
           {/* Back to Shop */}
           <button
             onClick={() => navigate('/shop')}
-            className="mt-4 w-full bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+            className="mt-4 w-full bg-slate-100 text-slate-800 py-2 rounded-lg hover:bg-slate-200 transition-colors font-medium"
           >
             Back to Shop
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

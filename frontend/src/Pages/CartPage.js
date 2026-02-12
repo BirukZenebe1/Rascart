@@ -1,198 +1,175 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-import { Link, useNavigate } from 'react-router-dom';
-
-import { useCart } from '../context/CartContext';
- 
 function CartPage() {
+  const [cartItems, setCartItems] = useState([]);
 
-  const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+  useEffect(() => {
+    // For now, cart items are stored in localStorage
+    // Later, you can fetch from backend
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
+  }, []);
 
-  const navigate = useNavigate();
-
-  const handleQuantityChange = (productId, newQuantity) => {
-
-    if (newQuantity >= 1) {
-
-      updateQuantity(productId, newQuantity);
-
+  const updateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(productId);
+      return;
     }
 
+    const updatedCart = cartItems.map(item =>
+      item._id === productId ? { ...item, quantity: newQuantity } : item
+    );
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  };
+
+  const removeFromCart = (productId) => {
+    const updatedCart = cartItems.filter(item => item._id !== productId);
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
   };
 
   if (cartItems.length === 0) {
-
     return (
-<div className="container mx-auto px-4 py-8">
-<h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
-<div className="bg-gray-100 p-8 rounded-lg text-center">
-<h2 className="text-xl font-medium text-gray-700">Your cart is empty</h2>
-<p className="text-gray-500 mt-2">Add some products to your cart and they will appear here</p>
-<button
-
-            onClick={() => navigate('/shop')}
-
-            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
->
-
-            Browse Products
-</button>
-</div>
-</div>
-
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+        <div className="container mx-auto px-4 py-10">
+          <h1 className="text-4xl font-black text-slate-900 mb-8">Shopping Cart</h1>
+          <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center shadow-lg">
+            <svg className="w-24 h-24 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Your cart is empty</h3>
+            <p className="text-slate-500 mb-4">Add some products to get started.</p>
+            <Link
+              to="/shop"
+              className="inline-block bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+            >
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
+      </div>
     );
-
   }
 
   return (
-<div className="container mx-auto px-4 py-8">
-<h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
-<div className="flex flex-col lg:flex-row gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+      <div className="container mx-auto px-4 py-10">
+        <h1 className="text-4xl font-black text-slate-900 mb-8">Shopping Cart</h1>
 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
-<div className="lg:w-2/3">
-<div className="bg-white rounded-lg shadow overflow-hidden">
-<div className="p-4 border-b">
-<h2 className="text-lg font-semibold">Cart Items ({cartItems.length})</h2>
-</div>
-<ul className="divide-y divide-gray-200">
-
-              {cartItems.map(item => (
-<li key={item._id} className="p-4 flex flex-col sm:flex-row">
-
-                  {/* Product Image */}
-<div className="sm:w-24 h-24 bg-gray-100 rounded overflow-hidden mb-4 sm:mb-0">
-<img 
-
-                      src={`https://placehold.co/200x200/e2e8f0/1e40af?text=${encodeURIComponent(item.name.split(' ')[0])}`}
-
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+            {cartItems.map((item) => (
+              <div key={item._id} className="flex items-center p-6 border-b border-slate-200 last:border-b-0">
+                {/* Product Image */}
+                <div className="w-24 h-24 flex-shrink-0">
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
                       alt={item.name}
-
-                      className="w-full h-full object-cover"
-
+                      className="w-full h-full object-cover rounded-lg"
                     />
-</div>
+                  ) : (
+                    <div className="w-full h-full bg-slate-100 rounded-lg flex items-center justify-center">
+                      <span className="text-slate-400">No image</span>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Product Details */}
-<div className="sm:ml-4 flex-grow">
-<div className="flex justify-between mb-2">
-<h3 className="font-medium">
-<Link to={`/product/${item._id}`} className="hover:text-blue-600">
+                {/* Product Details */}
+                <div className="flex-grow ml-6">
+                  <h3 className="text-lg font-semibold mb-1 text-slate-900">{item.name}</h3>
+                  <p className="text-slate-500 text-sm mb-2">{item.description?.substring(0, 60)}...</p>
+                  <div className="text-cyan-700 font-semibold">${item.price}</div>
+                </div>
 
-                          {item.name}
-</Link>
-</h3>
-<span className="font-bold">${(item.price * item.quantity).toFixed(2)}</span>
-</div>
-<p className="text-sm text-gray-500 mb-4 line-clamp-1">{item.description}</p>
-<div className="flex justify-between items-center">
+                {/* Quantity Controls */}
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                    className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center hover:bg-slate-100"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                    className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center hover:bg-slate-100"
+                  >
+                    +
+                  </button>
+                </div>
 
-                      {/* Quantity Selector */}
-<div className="flex items-center">
-<button 
+                {/* Remove Button */}
+                <button
+                  onClick={() => removeFromCart(item._id)}
+                  className="ml-6 text-rose-500 hover:text-rose-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
 
-                          onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
-
-                          className="bg-gray-200 px-2 py-1 rounded-l"
->
-
-                          -
-</button>
-<span className="w-10 text-center border-t border-b border-gray-200 py-1">
-
-                          {item.quantity}
-</span>
-<button 
-
-                          onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
-
-                          className="bg-gray-200 px-2 py-1 rounded-r"
->
-
-                          +
-</button>
-</div>
-
-                      {/* Remove Button */}
-<button
-
-                        onClick={() => removeFromCart(item._id)}
-
-                        className="text-red-600 hover:text-red-800 text-sm"
->
-
-                        Remove
-</button>
-</div>
-</div>
-</li>
-
-              ))}
-</ul>
-
-            {/* Cart Actions */}
-<div className="p-4 border-t flex justify-between">
-<button
-
-                onClick={clearCart}
-
-                className="text-red-600 hover:text-red-800"
->
-
-                Clear Cart
-</button>
-<button
-
-                onClick={() => navigate('/shop')}
-
-                className="text-blue-600 hover:text-blue-800"
->
-
-                Continue Shopping
-</button>
-</div>
-</div>
-</div>
+          <Link
+            to="/shop"
+            className="inline-block mt-4 text-cyan-700 hover:text-cyan-900 font-semibold"
+          >
+            ← Continue Shopping
+          </Link>
+        </div>
 
         {/* Order Summary */}
-<div className="lg:w-1/3">
-<div className="bg-white rounded-lg shadow overflow-hidden">
-<div className="p-4 border-b">
-<h2 className="text-lg font-semibold">Order Summary</h2>
-</div>
-<div className="p-4">
-<div className="space-y-3">
-<div className="flex justify-between">
-<span>Subtotal</span>
-<span>${getTotalPrice().toFixed(2)}</span>
-</div>
-<div className="flex justify-between">
-<span>Shipping</span>
-<span>Free</span>
-</div>
-<div className="border-t pt-3 font-bold flex justify-between">
-<span>Total</span>
-<span>${getTotalPrice().toFixed(2)}</span>
-</div>
-</div>
-<button
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sticky top-24">
+            <h2 className="text-xl font-semibold mb-4 text-slate-900">Order Summary</h2>
+            
+            <div className="space-y-3 mb-4">
+              <div className="flex justify-between">
+                <span className="text-slate-600">Subtotal</span>
+                <span className="font-semibold">${calculateTotal()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">Shipping</span>
+                <span className="font-semibold">Free</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">Tax</span>
+                <span className="font-semibold">$0.00</span>
+              </div>
+              <div className="border-t pt-3 flex justify-between text-lg">
+                <span className="font-semibold">Total</span>
+                <span className="font-bold text-cyan-700">${calculateTotal()}</span>
+              </div>
+            </div>
 
-                onClick={() => navigate('/checkout')}
+            <button className="w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 font-semibold mb-3 transition-colors">
+              Proceed to Checkout
+            </button>
 
-                className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
->
-
-                Proceed to Checkout
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-
+            <div className="text-center text-sm text-slate-500">
+              <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Secure Checkout
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
   );
-
 }
- 
+
 export default CartPage;
- 

@@ -124,38 +124,48 @@ function ShopPage() {
     setSearchQuery('');
     setCurrentPage(1);
   };
-  
-  // Generate pagination buttons
 
-    return (
-      <div className="flex justify-center mt-8 space-x-2">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-1 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
-        >
-          Previous
-        </button>
-        
-        {pages}
-        
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-    );
+  const activeFilterCount = [
+    Boolean(selectedCategory),
+    Boolean(priceRange.min),
+    Boolean(priceRange.max),
+    Boolean(searchQuery),
+    sortBy !== 'created_at',
+    sortOrder !== 'desc'
+  ].filter(Boolean).length;
+
+  const getVisiblePages = () => {
+    const pages = [];
+    const start = Math.max(1, currentPage - 1);
+    const end = Math.min(totalPages, currentPage + 1);
+
+    if (start > 1) {
+      pages.push(1);
+    }
+    if (start > 2) {
+      pages.push('...');
+    }
+    for (let page = start; page <= end; page += 1) {
+      pages.push(page);
+    }
+    if (end < totalPages - 1) {
+      pages.push('...');
+    }
+    if (end < totalPages) {
+      pages.push(totalPages);
+    }
+
+    return pages;
   };
   
   if (loading && products.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Shop</h1>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+        <div className="container mx-auto px-4 py-10">
+          <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-8">Shop</h1>
+          <div className="flex justify-center items-center h-64 bg-white/70 rounded-2xl border border-slate-200">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-600"></div>
+          </div>
         </div>
       </div>
     );
@@ -163,38 +173,66 @@ function ShopPage() {
   
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Shop</h1>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+        <div className="container mx-auto px-4 py-10">
+          <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-8">Shop</h1>
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+            {error}
+          </div>
         </div>
       </div>
     );
   }
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Shop</h1>
-      
-      <div className="flex flex-col md:flex-row gap-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+      <div className="container mx-auto px-4 py-10">
+        <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-xl mb-8">
+          <div className="absolute -top-12 -right-14 h-40 w-40 rounded-full bg-cyan-200/50 blur-2xl" />
+          <div className="absolute -bottom-12 -left-10 h-36 w-36 rounded-full bg-indigo-200/40 blur-2xl" />
+          <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] font-semibold text-cyan-700 mb-2">GebeyaAI Curated</p>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Shop smarter, look sharper</h1>
+              <p className="text-slate-600 mt-2">Browse style picks tailored for your vibe and budget.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center rounded-full bg-slate-900 text-white text-sm px-4 py-2">
+                {products.length} results
+              </span>
+              <span className="inline-flex items-center rounded-full bg-cyan-100 text-cyan-800 text-sm px-4 py-2">
+                {activeFilterCount} active filters
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <div className="flex flex-col lg:flex-row gap-6">
         {/* Filters Sidebar */}
-        <div className="w-full md:w-1/4 bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Filters</h2>
+        <div className="w-full lg:w-1/4 lg:sticky lg:top-24 h-fit bg-white p-5 rounded-2xl border border-slate-200 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-slate-900">Filters</h2>
+            {activeFilterCount > 0 && (
+              <span className="text-xs font-semibold bg-cyan-100 text-cyan-700 px-2 py-1 rounded-full">
+                {activeFilterCount} active
+              </span>
+            )}
+          </div>
           
           {/* Search */}
           <form onSubmit={handleSearch} className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Search</label>
             <div className="flex">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="flex-grow px-3 py-2 border rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-grow px-3 py-2 border border-slate-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-r hover:bg-blue-700"
+                className="bg-slate-900 text-white px-4 py-2 rounded-r-md hover:bg-slate-800 transition-colors"
               >
                 Search
               </button>
@@ -203,11 +241,11 @@ function ShopPage() {
           
           {/* Categories */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Category</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
             >
               <option value="">All Categories</option>
               {categories.map((category, index) => (
@@ -220,33 +258,33 @@ function ShopPage() {
           
           {/* Price Range */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Price Range</label>
             <div className="flex space-x-2">
               <input
                 type="number"
                 value={priceRange.min}
                 onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
                 placeholder="Min"
-                className="w-1/2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-1/2 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <input
                 type="number"
                 value={priceRange.max}
                 onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
                 placeholder="Max"
-                className="w-1/2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-1/2 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
           </div>
           
           {/* Sort By */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Sort By</label>
             <div className="flex space-x-2">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-2/3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-2/3 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               >
                 <option value="price">Price</option>
                 <option value="name">Name</option>
@@ -255,7 +293,7 @@ function ShopPage() {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="w-1/3 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-1/3 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
               >
                 <option value="asc">Asc</option>
                 <option value="desc">Desc</option>
@@ -267,13 +305,13 @@ function ShopPage() {
           <div className="flex space-x-2">
             <button
               onClick={applyFilters}
-              className="w-1/2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              className="w-1/2 bg-slate-900 text-white py-2 rounded-md hover:bg-slate-800 transition-colors"
             >
               Apply Filters
             </button>
             <button
               onClick={resetFilters}
-              className="w-1/2 bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300"
+              className="w-1/2 bg-slate-100 text-slate-700 py-2 rounded-md hover:bg-slate-200 transition-colors"
             >
               Reset
             </button>
@@ -281,14 +319,17 @@ function ShopPage() {
         </div>
         
         {/* Product Grid */}
-        <div className="w-full md:w-3/4">
+        <div className="w-full lg:w-3/4">
           {products.length === 0 ? (
-            <div className="bg-gray-100 p-8 rounded-lg text-center">
-              <h3 className="text-lg font-medium text-gray-700">No products found</h3>
-              <p className="text-gray-500 mt-1">Try adjusting your filters or search criteria</p>
+            <div className="bg-white border border-slate-200 p-10 rounded-2xl text-center shadow-lg">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-100 text-slate-700 mb-4 text-2xl">
+                ?
+              </div>
+              <h3 className="text-xl font-bold text-slate-800">No products found</h3>
+              <p className="text-slate-500 mt-1">Try adjusting your filters or search criteria.</p>
               <button
                 onClick={resetFilters}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="mt-5 bg-cyan-600 text-white px-5 py-2 rounded-md hover:bg-cyan-700 transition-colors"
               >
                 Clear Filters
               </button>
@@ -296,14 +337,14 @@ function ShopPage() {
           ) : (
             <>
               {/* Product count and current filters */}
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-                <span className="text-gray-600">
+              <div className="mb-5 p-4 bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 shadow-sm">
+                <span className="text-slate-600">
                   Showing <span className="font-medium">{products.length}</span> products
                 </span>
                 {(selectedCategory || priceRange.min || priceRange.max || searchQuery) && (
                   <button
                     onClick={resetFilters}
-                    className="text-sm text-blue-600 hover:text-blue-800"
+                    className="text-sm text-cyan-700 hover:text-cyan-900 font-semibold"
                   >
                     Clear all filters
                   </button>
@@ -311,43 +352,49 @@ function ShopPage() {
               </div>
               
               {/* Products grid with improved spacing and responsive design */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {products.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
               </div>
               
               {/* Enhanced pagination */}
-              <div className="flex justify-center mt-8 space-x-2">
+              <div className="flex justify-center mt-10 space-x-2">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50 transition-colors"
                 >
                   Previous
                 </button>
                 
                 {/* Show page numbers */}
                 <div className="flex space-x-1">
-                  {[...Array(totalPages).keys()].map(i => (
+                  {getVisiblePages().map((page, index) => (
+                    page === '...' ? (
+                      <span key={`ellipsis-${index}`} className="w-10 h-10 inline-flex items-center justify-center text-slate-400">
+                        ...
+                      </span>
+                    ) : (
                     <button
-                      key={i + 1}
-                      onClick={() => setCurrentPage(i + 1)}
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
                       className={`w-10 h-10 rounded-full ${
-                        currentPage === i + 1 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        currentPage === page
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       } transition-colors`}
                     >
-                      {i + 1}
+                      {page}
                     </button>
+                    )
                   ))}
                 </div>
                 
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50 transition-colors"
                 >
                   Next
                 </button>
@@ -355,6 +402,7 @@ function ShopPage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

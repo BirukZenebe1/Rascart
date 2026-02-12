@@ -1,91 +1,122 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 function LoginPage() {
-  const { login } = useAuth();
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const [serverError, setServerError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Show success message if redirected from registration
+
   const message = location.state?.message;
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
-    setServerError('');
-    
-    const result = await login({
-      email: data.email,
-      password: data.password
-    });
-    
-    setIsLoading(false);
-    
-    if (result.success) {
-      navigate('/profile'); // Redirect to profile page after login
-    } else {
-      setServerError(result.error);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:5001/api/auth/login', {
+        email,
+        password
+      });
+
+      if (response.data.token) {
+        // Store token and user info
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userId', response.data.user_id);
+        localStorage.setItem('username', response.data.username);
+        localStorage.setItem('userType', response.data.user_type);
+        
+        // Store profile photo if available
+        if (response.data.profile_photo) {
+          localStorage.setItem('profilePhoto', response.data.profile_photo);
+        }
+
+        // Redirect based on user type
+        if (response.data.user_type === 'seller') {
+          navigate('/seller/dashboard');
+        } else {
+          navigate('/');
+        }
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto max-w-md px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-6">Log In</h1>
-      
-      {message && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          {message}
-        </div>
-      )}
-      
-      {serverError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {serverError}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl shadow-xl p-8">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            id="email"
-            type="email"
-            {...register('email', { 
-              required: 'Email is required',
-              pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          <p className="text-center text-xs uppercase tracking-[0.25em] text-cyan-700 font-bold mb-2">Welcome Back</p>
+          <h2 className="text-center text-3xl font-black text-slate-900">
+            Sign in to your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-slate-600">
+            Don't have an account?{' '}
+            <Link to="/register" className="font-medium text-cyan-700 hover:text-cyan-900">
+              Register here
+            </Link>
+          </p>
         </div>
-        
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-          <input
-            id="password"
-            type="password"
-            {...register('password', { required: 'Password is required' })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-        </div>
-        
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          {isLoading ? 'Logging in...' : 'Log In'}
-        </button>
-      </form>
-      
-      <p className="text-center mt-4">
-        Don't have an account? <Link to="/register" className="text-blue-600 hover:underline">Create one</Link>
-      </p>
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {message && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-md">
+              {message}
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-slate-700">
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 transition-colors"
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

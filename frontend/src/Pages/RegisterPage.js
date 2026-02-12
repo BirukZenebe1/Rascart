@@ -1,115 +1,197 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 function RegisterPage() {
-  const { register: registerUser } = useAuth();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
-  const [serverError, setServerError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    userType: 'buyer' // Default to buyer
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
-  const password = watch('password', '');
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
-    setServerError('');
-    
-    const result = await registerUser({
-      username: data.username,
-      email: data.email,
-      password: data.password
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
-    
-    setIsLoading(false);
-    
-    if (result.success) {
-      navigate('/login', { state: { message: 'Registration successful! Please log in.' }});
-    } else {
-      setServerError(result.error);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:5001/api/auth/register', {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        user_type: formData.userType
+      });
+
+      if (response.data) {
+        // Redirect to login page
+        navigate('/login', { 
+          state: { 
+            message: 'Registration successful! Please login.',
+            userType: formData.userType
+          } 
+        });
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto max-w-md px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-6">Create an Account</h1>
-      
-      {serverError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {serverError}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl shadow-xl p-8">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-          <input
-            id="username"
-            type="text"
-            {...register('username', { 
-              required: 'Username is required',
-              minLength: { value: 3, message: 'Username must be at least 3 characters' }
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-          {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>}
+          <p className="text-center text-xs uppercase tracking-[0.25em] text-cyan-700 font-bold mb-2">Create Account</p>
+          <h2 className="text-center text-3xl font-black text-slate-900">
+            Create your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-slate-600">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-cyan-700 hover:text-cyan-900">
+              Sign in
+            </Link>
+          </p>
         </div>
-        
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            id="email"
-            type="email"
-            {...register('email', { 
-              required: 'Email is required',
-              pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-        </div>
-        
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-          <input
-            id="password"
-            type="password"
-            {...register('password', { 
-              required: 'Password is required',
-              minLength: { value: 6, message: 'Password must be at least 6 characters' }
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-        </div>
-        
-        <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
-          <input
-            id="confirmPassword"
-            type="password"
-            {...register('confirmPassword', { 
-              required: 'Please confirm your password',
-              validate: value => value === password || 'Passwords do not match'
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-          {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
-        </div>
-        
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          {isLoading ? 'Creating Account...' : 'Create Account'}
-        </button>
-      </form>
-      
-      <p className="text-center mt-4">
-        Already have an account? <Link to="/login" className="text-blue-600 hover:underline">Log in</Link>
-      </p>
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
+
+          {/* User Type Selection */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              I want to:
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, userType: 'buyer' })}
+                className={`p-4 border-2 rounded-lg transition-all ${
+                  formData.userType === 'buyer'
+                    ? 'border-cyan-600 bg-cyan-50'
+                    : 'border-slate-300 hover:border-slate-400'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="font-semibold text-slate-900">Shop</div>
+                  <div className="text-xs text-slate-500">Browse and buy products</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, userType: 'seller' })}
+                className={`p-4 border-2 rounded-lg transition-all ${
+                  formData.userType === 'seller'
+                    ? 'border-cyan-600 bg-cyan-50'
+                    : 'border-slate-300 hover:border-slate-400'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="font-semibold text-slate-900">Sell</div>
+                  <div className="text-xs text-slate-500">List and manage products</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="username" className="block text-sm font-semibold text-slate-700">
+              Username
+            </label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              value={formData.username}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-slate-700">
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700">
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 transition-colors"
+          >
+            {loading ? 'Creating account...' : 'Create account'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
