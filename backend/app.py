@@ -16,16 +16,21 @@ app = Flask(__name__, static_folder=frontend_build_dir, static_url_path='/')
 CORS(app)  # Enable CORS for all routes
 
 # Configure MongoDB
-app.config["MONGO_URI"] = os.environ.get("MONGO_URI", "mongodb://localhost:27017/personashop")
+mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/personashop")
+if "serverSelectionTimeoutMS" not in mongo_uri:
+    separator = "&" if "?" in mongo_uri else "?"
+    mongo_uri = f"{mongo_uri}{separator}serverSelectionTimeoutMS=5000&connectTimeoutMS=5000"
+app.config["MONGO_URI"] = mongo_uri
 mongo = PyMongo(app)
 
-# Test MongoDB connection
+# Test MongoDB connection (skip blocking ping in Lambda)
 try:
-    mongo.db.command('ping')
-    print("MongoDB connected successfully!")
+    if not os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        mongo.db.command('ping')
+        print("MongoDB connected successfully!")
 except Exception as e:
+    # Do not exit on startup; allow app to serve health endpoints.
     print(f"MongoDB connection failed: {e}")
-    exit(1)
 
 # Configure JWT
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key-change-in-production")
