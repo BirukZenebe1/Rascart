@@ -12,20 +12,20 @@ function HomePage() {
           <div className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-indigo-200/40 blur-2xl" />
           <div className="hero-orbit" aria-hidden="true">
             <div className="orbit-ring">
-              <div className="float-item" style={{ top: '5%', left: '50%' }}>Smart Watch</div>
-              <div className="float-item" style={{ top: '25%', left: '85%' }}>Leather Bag</div>
-              <div className="float-item" style={{ top: '70%', left: '80%' }}>Noise Cancelling</div>
-              <div className="float-item" style={{ top: '85%', left: '45%' }}>Minimal Sneakers</div>
-              <div className="float-item" style={{ top: '65%', left: '10%' }}>Ceramic Vase</div>
-              <div className="float-item" style={{ top: '20%', left: '5%' }}>Tech Backpack</div>
+              <div className="float-item" style={{ top: '5%', left: '50%' }}>Sneakers</div>
+              <div className="float-item" style={{ top: '25%', left: '85%' }}>Summer Dress</div>
+              <div className="float-item" style={{ top: '70%', left: '80%' }}>Leather Hat</div>
+              <div className="float-item" style={{ top: '85%', left: '45%' }}>Crossbody Bag</div>
+              <div className="float-item" style={{ top: '65%', left: '10%' }}>Statement Heels</div>
+              <div className="float-item" style={{ top: '20%', left: '5%' }}>Denim Jacket</div>
             </div>
             <div className="orbit-ring reverse">
-              <div className="float-chip" style={{ top: '10%', left: '65%' }}>Premium Denim</div>
-              <div className="float-chip" style={{ top: '40%', left: '92%' }}>Signature Scents</div>
-              <div className="float-chip" style={{ top: '78%', left: '72%' }}>Travel Gear</div>
-              <div className="float-chip" style={{ top: '88%', left: '30%' }}>Studio Lighting</div>
-              <div className="float-chip" style={{ top: '55%', left: '2%' }}>Home Office</div>
-              <div className="float-chip" style={{ top: '22%', left: '15%' }}>Everyday Basics</div>
+              <div className="float-chip" style={{ top: '10%', left: '65%' }}>Silk Scarf</div>
+              <div className="float-chip" style={{ top: '40%', left: '92%' }}>Classic Watch</div>
+              <div className="float-chip" style={{ top: '78%', left: '72%' }}>Travel Tote</div>
+              <div className="float-chip" style={{ top: '88%', left: '30%' }}>Retro Shades</div>
+              <div className="float-chip" style={{ top: '55%', left: '2%' }}>Cozy Knit</div>
+              <div className="float-chip" style={{ top: '22%', left: '15%' }}>Everyday Tee</div>
             </div>
           </div>
           <div className="relative">

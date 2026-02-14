@@ -1,4 +1,8 @@
-const envApiBase = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+const rawEnvBase =
+  process.env.REACT_APP_API_BASE_URL ||
+  process.env.REACT_APP_API_URL ||
+  '';
+const envApiBase = rawEnvBase.replace(/\/$/, '');
 const isNetlifyHost = typeof window !== 'undefined' && window.location.hostname.includes('netlify.app');
 const fallbackApiBase = isNetlifyHost ? 'https://merkato-ai.onrender.com' : '';
 
