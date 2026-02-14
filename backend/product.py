@@ -6,6 +6,20 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 # Initialize blueprint
 product_bp = Blueprint('product', __name__)
 
+def _serialize_product(product):
+    if not product:
+        return product
+    product['_id'] = str(product['_id'])
+    if 'seller_id' in product and product['seller_id'] is not None:
+        product['seller_id'] = str(product['seller_id'])
+    if 'seller_profile' in product and product['seller_profile'] is not None:
+        product['seller_profile'] = str(product['seller_profile'])
+    if 'created_at' in product:
+        product['created_at'] = product['created_at'].isoformat()
+    if 'updated_at' in product:
+        product['updated_at'] = product['updated_at'].isoformat()
+    return product
+
 # Get all products with filtering, sorting, and pagination
 @product_bp.route('/list', methods=['GET'])
 def list_products():
@@ -66,13 +80,7 @@ def list_products():
         # Format products for response
         formatted_products = []
         for product in products:
-            product['_id'] = str(product['_id'])
-            # Convert datetime objects
-            if 'created_at' in product:
-                product['created_at'] = product['created_at'].isoformat()
-            if 'updated_at' in product:
-                product['updated_at'] = product['updated_at'].isoformat()
-            formatted_products.append(product)
+            formatted_products.append(_serialize_product(product))
         
         # Calculate total pages
         total_pages = (total_products + per_page - 1) // per_page
@@ -109,11 +117,7 @@ def get_product(product_id):
             return jsonify({'error': 'Product not found'}), 404
         
         # Format product for response
-        product['_id'] = str(product['_id'])
-        if 'created_at' in product:
-            product['created_at'] = product['created_at'].isoformat()
-        if 'updated_at' in product:
-            product['updated_at'] = product['updated_at'].isoformat()
+        product = _serialize_product(product)
             
         return jsonify({'product': product})
     
@@ -139,15 +143,10 @@ def get_recommendations():
             products = list(product_bp.mongo.db.products.find()
                             .sort('created_at', -1)
                             .limit(6))
-            
-            # Format products
+
             for product in products:
-                product['_id'] = str(product['_id'])
-                if 'created_at' in product:
-                    product['created_at'] = product['created_at'].isoformat()
-                if 'updated_at' in product:
-                    product['updated_at'] = product['updated_at'].isoformat()
-            
+                _serialize_product(product)
+
             return jsonify({
                 'products': products,
                 'message': 'Default recommendations (no style profile)'
@@ -198,11 +197,7 @@ def get_recommendations():
         
         # Format products for response
         for product in products:
-            product['_id'] = str(product['_id'])
-            if 'created_at' in product:
-                product['created_at'] = product['created_at'].isoformat()
-            if 'updated_at' in product:
-                product['updated_at'] = product['updated_at'].isoformat()
+            _serialize_product(product)
         
         return jsonify({
             'products': products,
@@ -227,11 +222,7 @@ def get_product_with_style_match(product_id):
             return jsonify({'error': 'Product not found'}), 404
         
         # Format product for response
-        product['_id'] = str(product['_id'])
-        if 'created_at' in product:
-            product['created_at'] = product['created_at'].isoformat()
-        if 'updated_at' in product:
-            product['updated_at'] = product['updated_at'].isoformat()
+        product = _serialize_product(product)
         
         # Get user's style profile if available
         user = product_bp.mongo.db.users.find_one({
