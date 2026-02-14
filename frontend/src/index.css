@@ -86,11 +86,11 @@ a[class*="bg-emerald-600"]:hover {
 .float-chip {
   position: absolute;
   transform: translate(-50%, -50%);
-  padding: 0.45rem 0.9rem;
+  padding: 0.6rem;
   border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.3);
@@ -98,16 +98,8 @@ a[class*="bg-emerald-600"]:hover {
   animation: hero-float 6s ease-in-out infinite;
 }
 
-.emoji {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  margin-right: 0.35rem;
-}
-
 .float-chip {
-  background: rgba(224, 231, 255, 0.85);
+  background: rgba(224, 231, 255, 0.75);
   border-color: rgba(99, 102, 241, 0.25);
   color: #1e293b;
   animation-duration: 7.5s;

@@ -12,56 +12,20 @@ function HomePage() {
           <div className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-indigo-200/40 blur-2xl" />
           <div className="hero-orbit" aria-hidden="true">
             <div className="orbit-ring">
-              <div className="float-item" style={{ top: '5%', left: '50%' }}>
-                <span className="emoji" aria-hidden="true">👟</span>
-                Sneakers
-              </div>
-              <div className="float-item" style={{ top: '25%', left: '85%' }}>
-                <span className="emoji" aria-hidden="true">👗</span>
-                Summer Dress
-              </div>
-              <div className="float-item" style={{ top: '70%', left: '80%' }}>
-                <span className="emoji" aria-hidden="true">🤠</span>
-                Leather Hat
-              </div>
-              <div className="float-item" style={{ top: '85%', left: '45%' }}>
-                <span className="emoji" aria-hidden="true">👜</span>
-                Crossbody Bag
-              </div>
-              <div className="float-item" style={{ top: '65%', left: '10%' }}>
-                <span className="emoji" aria-hidden="true">👠</span>
-                Statement Heels
-              </div>
-              <div className="float-item" style={{ top: '20%', left: '5%' }}>
-                <span className="emoji" aria-hidden="true">🧥</span>
-                Denim Jacket
-              </div>
+              <div className="float-item" style={{ top: '5%', left: '50%' }}>👟</div>
+              <div className="float-item" style={{ top: '25%', left: '85%' }}>👗</div>
+              <div className="float-item" style={{ top: '70%', left: '80%' }}>🤠</div>
+              <div className="float-item" style={{ top: '85%', left: '45%' }}>👜</div>
+              <div className="float-item" style={{ top: '65%', left: '10%' }}>👠</div>
+              <div className="float-item" style={{ top: '20%', left: '5%' }}>🧥</div>
             </div>
             <div className="orbit-ring reverse">
-              <div className="float-chip" style={{ top: '10%', left: '65%' }}>
-                <span className="emoji" aria-hidden="true">🧣</span>
-                Silk Scarf
-              </div>
-              <div className="float-chip" style={{ top: '40%', left: '92%' }}>
-                <span className="emoji" aria-hidden="true">⌚</span>
-                Classic Watch
-              </div>
-              <div className="float-chip" style={{ top: '78%', left: '72%' }}>
-                <span className="emoji" aria-hidden="true">🧳</span>
-                Travel Tote
-              </div>
-              <div className="float-chip" style={{ top: '88%', left: '30%' }}>
-                <span className="emoji" aria-hidden="true">🕶️</span>
-                Retro Shades
-              </div>
-              <div className="float-chip" style={{ top: '55%', left: '2%' }}>
-                <span className="emoji" aria-hidden="true">🧶</span>
-                Cozy Knit
-              </div>
-              <div className="float-chip" style={{ top: '22%', left: '15%' }}>
-                <span className="emoji" aria-hidden="true">👕</span>
-                Everyday Tee
-              </div>
+              <div className="float-chip" style={{ top: '10%', left: '65%' }}>🧣</div>
+              <div className="float-chip" style={{ top: '40%', left: '92%' }}>⌚</div>
+              <div className="float-chip" style={{ top: '78%', left: '72%' }}>🧳</div>
+              <div className="float-chip" style={{ top: '88%', left: '30%' }}>🕶️</div>
+              <div className="float-chip" style={{ top: '55%', left: '2%' }}>🧶</div>
+              <div className="float-chip" style={{ top: '22%', left: '15%' }}>👕</div>
             </div>
           </div>
           <div className="relative">
