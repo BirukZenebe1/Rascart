@@ -10,6 +10,24 @@ function HomePage() {
         <section className="relative overflow-hidden text-center rounded-3xl bg-white border border-slate-200 shadow-xl p-8 md:p-12">
           <div className="absolute -top-16 -right-10 h-48 w-48 rounded-full bg-cyan-200/50 blur-2xl" />
           <div className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-indigo-200/40 blur-2xl" />
+          <div className="hero-orbit" aria-hidden="true">
+            <div className="orbit-ring">
+              <div className="float-item" style={{ top: '5%', left: '50%' }}>Smart Watch</div>
+              <div className="float-item" style={{ top: '25%', left: '85%' }}>Leather Bag</div>
+              <div className="float-item" style={{ top: '70%', left: '80%' }}>Noise Cancelling</div>
+              <div className="float-item" style={{ top: '85%', left: '45%' }}>Minimal Sneakers</div>
+              <div className="float-item" style={{ top: '65%', left: '10%' }}>Ceramic Vase</div>
+              <div className="float-item" style={{ top: '20%', left: '5%' }}>Tech Backpack</div>
+            </div>
+            <div className="orbit-ring reverse">
+              <div className="float-chip" style={{ top: '10%', left: '65%' }}>Premium Denim</div>
+              <div className="float-chip" style={{ top: '40%', left: '92%' }}>Signature Scents</div>
+              <div className="float-chip" style={{ top: '78%', left: '72%' }}>Travel Gear</div>
+              <div className="float-chip" style={{ top: '88%', left: '30%' }}>Studio Lighting</div>
+              <div className="float-chip" style={{ top: '55%', left: '2%' }}>Home Office</div>
+              <div className="float-chip" style={{ top: '22%', left: '15%' }}>Everyday Basics</div>
+            </div>
+          </div>
           <div className="relative">
             <p className="text-xs uppercase tracking-[0.24em] text-cyan-700 font-bold mb-3">merkatoAI Shopping</p>
             <h1 className="text-4xl md:text-5xl font-black mb-4 text-slate-900">Welcome to merkatoAI</h1>

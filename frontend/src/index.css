@@ -55,3 +55,71 @@ a[class*="bg-blue-500"]:hover,
 a[class*="bg-emerald-600"]:hover {
   background-color: var(--brand-ai-hover) !important;
 }
+
+.btn-logout {
+  background-color: #ef4444 !important;
+}
+
+.btn-logout:hover {
+  background-color: #dc2626 !important;
+}
+
+.hero-orbit {
+  position: absolute;
+  inset: -35% -20% -35% -20%;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.orbit-ring {
+  position: absolute;
+  inset: 0;
+  animation: hero-spin 48s linear infinite;
+}
+
+.orbit-ring.reverse {
+  animation-direction: reverse;
+  animation-duration: 62s;
+}
+
+.float-item,
+.float-chip {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+.float-chip {
+  background: rgba(224, 231, 255, 0.85);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #1e293b;
+  animation-duration: 7.5s;
+}
+
+@keyframes hero-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-12px);
+  }
+}

@@ -8,6 +8,7 @@ import LoginPage from './Pages/LoginPage';
 import RegisterPage from './Pages/RegisterPage';
 import CartPage from './Pages/CartPage';
 import ProfilePage from './Pages/ProfilePage';
+import CheckoutPage from './Pages/CheckoutPage';
 import SellerDashboard from './Pages/Seller/SellerDashboard';
 import AddProductPage from './Pages/Seller/AddProductPage';
 import EditProductPage from './Pages/Seller/EditProductPage';
@@ -58,6 +59,11 @@ function App() {
             
             {/* Buyer Routes */}
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={
+              <PrivateRoute>
+                <CheckoutPage />
+              </PrivateRoute>
+            } />
             <Route path="/profile" element={<ProfilePage />} />
             
             {/* Seller Routes (Protected) */}

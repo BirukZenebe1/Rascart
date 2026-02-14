@@ -35,6 +35,7 @@ function Navbar() {
                   <Link to="/seller/dashboard" className="text-slate-700 hover:text-cyan-700 font-medium">Dashboard</Link>
                   <Link to="/seller/products" className="text-slate-700 hover:text-cyan-700 font-medium">My Products</Link>
                   <Link to="/seller/products/add" className="text-slate-700 hover:text-cyan-700 font-medium">Add Product</Link>
+                  <Link to="/seller/profile" className="text-slate-700 hover:text-cyan-700 font-medium">Profile</Link>
                 </>
               ) : (
                 <>

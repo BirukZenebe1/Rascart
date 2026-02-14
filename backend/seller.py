@@ -11,6 +11,13 @@ seller_bp = Blueprint('seller', __name__)
 
 def save_product_image(base64_string, filename_prefix='product', host_url=''):
     try:
+        if os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+            if base64_string.startswith('data:'):
+                return base64_string
+            if 'base64,' in base64_string:
+                base64_string = base64_string.split('base64,')[1]
+            return f"data:image/png;base64,{base64_string}"
+
         upload_folder = os.path.join(os.path.dirname(__file__), 'uploads', 'products')
         os.makedirs(upload_folder, exist_ok=True)
 

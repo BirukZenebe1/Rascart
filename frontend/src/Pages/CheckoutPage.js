@@ -58,6 +58,10 @@ function CheckoutPage() {
   
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!window.confirm('Place this order now?')) {
+      setIsSubmitting(false);
+      return;
+    }
     setIsSubmitting(true);
     
     // Simulate order processing

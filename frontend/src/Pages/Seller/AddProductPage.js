@@ -51,6 +51,16 @@ function AddProductPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image must be less than 2MB');
+      return;
+    }
+    setError('');
+
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result;
@@ -288,6 +298,7 @@ function AddProductPage() {
               onChange={handleImageUpload}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             />
+            <p className="text-xs text-slate-500 mt-2">Max size 2MB. Recommended square image.</p>
             {imagePreview && (
               <img
                 src={imagePreview}

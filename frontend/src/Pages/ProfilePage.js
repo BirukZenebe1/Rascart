@@ -66,6 +66,9 @@ function ProfilePage() {
   };
 
   const handleLogout = () => {
+    if (!window.confirm('Are you sure you want to log out?')) {
+      return;
+    }
     localStorage.clear();
     navigate('/login');
   };
@@ -268,7 +271,7 @@ function ProfilePage() {
         <div className="mt-8 flex justify-end">
           <button
             onClick={handleLogout}
-            className="bg-slate-900 text-white px-6 py-3 rounded-md hover:bg-slate-800 transition-colors font-semibold"
+            className="btn-logout text-white px-6 py-3 rounded-md transition-colors font-semibold"
           >
             Logout
           </button>

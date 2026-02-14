@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function CartPage() {
   const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // For now, cart items are stored in localStorage
@@ -34,6 +35,13 @@ function CartPage() {
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+  };
+
+  const handleProceedToCheckout = () => {
+    if (!window.confirm('Proceed to checkout?')) {
+      return;
+    }
+    navigate('/checkout');
   };
 
   if (cartItems.length === 0) {
@@ -154,7 +162,10 @@ function CartPage() {
               </div>
             </div>
 
-            <button className="w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 font-semibold mb-3 transition-colors">
+            <button
+              onClick={handleProceedToCheckout}
+              className="w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 font-semibold mb-3 transition-colors"
+            >
               Proceed to Checkout
             </button>
 
