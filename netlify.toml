@@ -3,6 +3,9 @@
   publish = "frontend/build"
 
 [build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "REACT_APP_API_BASE_URL"
+
+[build.environment]
   NODE_VERSION = "20"
 
 [[redirects]]
