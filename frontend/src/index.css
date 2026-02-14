@@ -98,6 +98,14 @@ a[class*="bg-emerald-600"]:hover {
   animation: hero-float 6s ease-in-out infinite;
 }
 
+.emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-right: 0.35rem;
+}
+
 .float-chip {
   background: rgba(224, 231, 255, 0.85);
   border-color: rgba(99, 102, 241, 0.25);

@@ -10,6 +10,7 @@ function ProductDetailPage() {
   const { id: productId } = useParams();
   const auth = useAuth();
   const token = auth?.token || localStorage.getItem('token');
+  const isSeller = localStorage.getItem('userType') === 'seller';
   const navigate = useNavigate();
   const cart = useCart();
   const [product, setProduct] = useState(null);
@@ -292,13 +293,14 @@ function ProductDetailPage() {
             </div>
           </div>
           
-          {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            className="mt-6 w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
-          >
-            Add to Cart
-          </button>
+          {!isSeller && (
+            <button
+              onClick={handleAddToCart}
+              className="mt-6 w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
+            >
+              Add to Cart
+            </button>
+          )}
           
           {/* Back to Shop */}
           <button
