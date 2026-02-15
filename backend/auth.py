@@ -379,7 +379,7 @@ def reset_password():
         hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
         auth_bp.mongo.db.users.update_one(
             {'_id': user['_id']},
-            {'$set': {'password': hashed_password}, '$unset': {'reset_code': '', 'reset_expires': ''}}
+            {'$set': {'password': hashed_password, 'is_verified': True}, '$unset': {'reset_code': '', 'reset_expires': '', 'verification_code': '', 'verification_expires': ''}}
         )
         return jsonify({"message": "Password updated"}), 200
 

@@ -39,7 +39,7 @@ function ForgotPasswordPage() {
         code,
         new_password: newPassword
       });
-      setMessage('Password updated. You can now login.');
+      setMessage('Password updated. You can now login with your email and new password.');
       setStep('done');
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to reset password');
@@ -129,6 +129,11 @@ function ForgotPasswordPage() {
               {loading ? 'Updating...' : 'Reset Password'}
             </button>
           </form>
+        )}
+        {step === 'done' && (
+          <div className="mt-6 text-center">
+            <Link to="/login" className="text-cyan-700 font-semibold">Go to login</Link>
+          </div>
         )}
       </div>
     </div>
