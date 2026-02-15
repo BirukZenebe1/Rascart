@@ -1,7 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function OrderSuccessPage() {
+  const location = useLocation();
+  const orderId = location.state?.orderId;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
       <div className="container mx-auto px-4 py-16 text-center">
@@ -13,6 +16,10 @@ function OrderSuccessPage() {
           <h1 className="mt-4 text-3xl font-black text-slate-900">Order Successful!</h1>
           <p className="mt-2 text-lg text-slate-600">Thank you for your purchase.</p>
           <p className="text-slate-500">Your order has been placed and will be processed soon.</p>
+          {orderId && (
+            <p className="text-slate-700 mt-2">Order ID: <span className="font-semibold">{orderId}</span></p>
+          )}
+          <p className="text-slate-500 mt-2">A confirmation email has been sent to your inbox.</p>
           
           <div className="mt-8 flex justify-center space-x-4">
             <Link 

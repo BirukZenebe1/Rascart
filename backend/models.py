@@ -10,16 +10,58 @@ def create_user(username, email, password_hash, user_type='buyer'):
         "email": email,
         "password": password_hash,
         "user_type": user_type,
+        "is_verified": False,
+        "verification_code": None,
+        "verification_expires": None,
+        "reset_code": None,
+        "reset_expires": None,
         "personalization_state": "default",
         "is_personalized": False,
         "profile_photo": None,
         "created_at": datetime.now(),
         "style_profile": None,
         "preferred_payment_method": "",
+        "payment_verified": False,
         "cart": [],
         "orders": [],
         "seller_profile": None,
         "is_active": True
+    }
+
+def create_order(user_id, items, total, payment_method, promo_code=None, discount=0):
+    return {
+        "user_id": user_id,
+        "items": items,
+        "total": total,
+        "payment_method": payment_method,
+        "promo_code": promo_code,
+        "discount": discount,
+        "status": "placed",
+        "created_at": datetime.now(),
+        "updated_at": datetime.now()
+    }
+
+def create_promo_code(code, discount_type, discount_value, expires_at=None, usage_limit=None):
+    return {
+        "code": code.upper(),
+        "discount_type": discount_type,  # "percent" or "amount"
+        "discount_value": discount_value,
+        "expires_at": expires_at,
+        "usage_limit": usage_limit,
+        "used_count": 0,
+        "is_active": True,
+        "created_at": datetime.now(),
+        "updated_at": datetime.now()
+    }
+
+def create_message_thread(product_id, buyer_id, seller_id):
+    return {
+        "product_id": product_id,
+        "buyer_id": buyer_id,
+        "seller_id": seller_id,
+        "messages": [],
+        "created_at": datetime.now(),
+        "updated_at": datetime.now()
     }
 
 def create_seller_profile(user_id, business_name, business_description='', business_email='', phone=''):

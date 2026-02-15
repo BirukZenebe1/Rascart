@@ -17,6 +17,11 @@ import SellerRoute from './components/SellerRoute';
 import PrivateRoute from './components/PrivateRoute';
 import Footer from './components/Footer';
 import AboutPage from './Pages/AboutPage';
+import TermsPage from './Pages/TermsPage';
+import ForgotPasswordPage from './Pages/ForgotPasswordPage';
+import SupportPage from './Pages/SupportPage';
+import SellerChatsPage from './Pages/Seller/SellerChatsPage';
+import AdminPromoPage from './Pages/AdminPromoPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import StyleResultsPage from './Pages/StyleResultsPage';
@@ -45,7 +50,10 @@ function App() {
             } />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="/style-questionnaire" element={
               <PrivateRoute>
                 <StyleQuestionnaire />
@@ -91,6 +99,16 @@ function App() {
               <SellerRoute>
                 <ProfilePage />
               </SellerRoute>
+            } />
+            <Route path="/seller/chats" element={
+              <SellerRoute>
+                <SellerChatsPage />
+              </SellerRoute>
+            } />
+            <Route path="/admin/promos" element={
+              <PrivateRoute>
+                <AdminPromoPage />
+              </PrivateRoute>
             } />
               </Routes>
             </main>

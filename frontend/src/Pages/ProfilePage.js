@@ -12,9 +12,26 @@ function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     fetchUserProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await axios.get(apiUrl('/api/orders/my'), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setOrders(response.data.orders || []);
+      } catch (err) {
+        console.error('Failed to fetch orders:', err);
+      }
+    };
+    fetchOrders();
   }, []);
 
   const fetchUserProfile = async () => {
@@ -187,6 +204,9 @@ function ProfilePage() {
                     <option value="paypal">PayPal</option>
                     <option value="cash_on_delivery">Cash on Delivery</option>
                   </select>
+                  {user.preferred_payment_method && (
+                    <div className="mt-2 text-sm text-emerald-700">Payment method verified</div>
+                  )}
                 </div>
               )}
 
@@ -231,9 +251,14 @@ function ProfilePage() {
                   <p className="text-sm text-emerald-700/80 mb-3">
                     Your recommendations are now optimized for your taste.
                   </p>
-                  <Link to="/style-results" className="inline-flex bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium">
-                    View My Style Results
-                  </Link>
+                  <div className="flex flex-wrap gap-3">
+                    <Link to="/style-results" className="inline-flex bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium">
+                      View My Style Results
+                    </Link>
+                    <Link to="/style-questionnaire" className="inline-flex bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors font-medium">
+                      Edit Style Profile
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <div>
@@ -256,13 +281,29 @@ function ProfilePage() {
           {user.user_type !== 'seller' && (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
               <h3 className="text-xl font-semibold mb-4 text-slate-900">Recent Orders</h3>
-              <div className="text-center py-8 text-slate-500">
-                <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                <p>No orders yet</p>
-                <p className="text-sm mt-1">Start shopping to see your orders here</p>
-              </div>
+              {orders.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  <p>No orders yet</p>
+                  <p className="text-sm mt-1">Start shopping to see your orders here</p>
+                </div>
+              ) : (
+                <ul className="space-y-4">
+                  {orders.slice(0, 5).map((order) => (
+                    <li key={order._id} className="border border-slate-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-900">Order {order._id}</span>
+                        <span className="text-sm text-slate-500">{new Date(order.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <div className="text-sm text-slate-600 mt-2">
+                        {order.items?.length || 0} items • ${Number(order.total).toFixed(2)}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>

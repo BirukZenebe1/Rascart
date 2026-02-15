@@ -27,6 +27,7 @@ function AddProductPage() {
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [imageConfirmed, setImageConfirmed] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -127,6 +128,11 @@ function AddProductPage() {
     }
     if (!formData.image_data && !formData.image_url) {
       setError('Please upload a product image or provide an image URL');
+      setLoading(false);
+      return;
+    }
+    if (!imageConfirmed) {
+      setError('Please confirm the image matches the item name');
       setLoading(false);
       return;
     }
@@ -306,6 +312,15 @@ function AddProductPage() {
                 className="mt-3 h-28 w-28 rounded-md object-cover border"
               />
             )}
+            <label className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={imageConfirmed}
+                onChange={(e) => setImageConfirmed(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+              />
+              I confirm this image matches the product name
+            </label>
           </div>
 
           {/* Optional Image URL */}

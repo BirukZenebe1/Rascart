@@ -16,6 +16,13 @@ def save_base64_image(base64_string, filename_prefix='profile'):
     Returns the filename if successful, None otherwise
     """
     try:
+        if os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+            if base64_string.startswith('data:'):
+                return base64_string
+            if 'base64,' in base64_string:
+                base64_string = base64_string.split('base64,')[1]
+            return f"data:image/png;base64,{base64_string}"
+
         # Create uploads directory if it doesn't exist
         upload_folder = os.path.join(os.path.dirname(__file__), 'uploads', 'profiles')
         os.makedirs(upload_folder, exist_ok=True)

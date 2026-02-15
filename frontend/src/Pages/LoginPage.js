@@ -31,6 +31,7 @@ function LoginPage() {
         localStorage.setItem('userId', response.data.user_id);
         localStorage.setItem('username', response.data.username);
         localStorage.setItem('userType', response.data.user_type);
+        localStorage.setItem('email', response.data.email || email);
         
         // Store profile photo if available
         if (response.data.profile_photo) {
@@ -45,7 +46,11 @@ function LoginPage() {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      if (err.response?.data?.verification_required) {
+        setError('Email not verified. Please check your inbox for the verification code.');
+      } else {
+        setError(err.response?.data?.error || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -108,6 +113,12 @@ function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
             />
+          </div>
+
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-sm text-cyan-700 font-semibold hover:text-cyan-900">
+              Forgot password?
+            </Link>
           </div>
 
           <button

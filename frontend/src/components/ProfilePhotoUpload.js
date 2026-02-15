@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL, apiUrl } from '../config';
 
@@ -6,6 +6,10 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentPhoto);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setPreview(currentPhoto);
+  }, [currentPhoto]);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -100,7 +104,9 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
         <div className="w-32 h-32 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-lg">
           {preview ? (
             <img
-              src={preview.startsWith('http') ? preview : `${API_BASE_URL || ''}/api/auth${preview}`}
+              src={preview.startsWith('http') || preview.startsWith('data:')
+                ? preview
+                : `${API_BASE_URL || ''}/api/auth${preview}`}
               alt="Profile"
               className="w-full h-full object-cover"
             />

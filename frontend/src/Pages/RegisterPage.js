@@ -13,6 +13,9 @@ function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [verificationStep, setVerificationStep] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -36,6 +39,10 @@ function RegisterPage() {
       setError('Password must be at least 6 characters');
       return;
     }
+    if (!termsAccepted) {
+      setError('You must accept the terms and conditions');
+      return;
+    }
 
     setLoading(true);
 
@@ -44,20 +51,39 @@ function RegisterPage() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        user_type: formData.userType
+        user_type: formData.userType,
+        terms_accepted: termsAccepted
       });
 
       if (response.data) {
-        // Redirect to login page
-        navigate('/login', { 
-          state: { 
-            message: 'Registration successful! Please login.',
-            userType: formData.userType
-          } 
-        });
+        setVerificationStep(true);
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const response = await axios.post(apiUrl('/api/auth/verify-email'), {
+        email: formData.email,
+        code: verificationCode
+      });
+      if (response.data) {
+        navigate('/login', {
+          state: {
+            message: 'Email verified. Please login.',
+            userType: formData.userType
+          }
+        });
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Verification failed');
     } finally {
       setLoading(false);
     }
@@ -79,7 +105,8 @@ function RegisterPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        {!verificationStep ? (
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
               {error}
@@ -184,6 +211,19 @@ function RegisterPage() {
             />
           </div>
 
+          <div className="flex items-start gap-3">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+            />
+            <label htmlFor="terms" className="text-sm text-slate-600">
+              I agree to the <Link to="/terms" className="text-cyan-700 hover:text-cyan-900 font-semibold">Terms and Conditions</Link>
+            </label>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -191,7 +231,40 @@ function RegisterPage() {
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
-        </form>
+          </form>
+        ) : (
+          <form className="mt-8 space-y-6" onSubmit={handleVerify}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                {error}
+              </div>
+            )}
+            <div className="bg-cyan-50 border border-cyan-200 text-cyan-700 px-4 py-3 rounded-md">
+              We sent a verification code to {formData.email}.
+            </div>
+            <div>
+              <label htmlFor="verificationCode" className="block text-sm font-semibold text-slate-700">
+                Verification Code
+              </label>
+              <input
+                id="verificationCode"
+                name="verificationCode"
+                type="text"
+                required
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 transition-colors"
+            >
+              {loading ? 'Verifying...' : 'Verify Email'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -33,7 +33,8 @@ function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link to="/about" className="hover:text-cyan-300">About</Link></li>
               <li><Link to="/" className="hover:text-cyan-300">How It Works</Link></li>
-              <li><a href="mailto:support@gebeyaai.com" className="hover:text-cyan-300">Contact</a></li>
+              <li><Link to="/support" className="hover:text-cyan-300">Support</Link></li>
+              <li><Link to="/terms" className="hover:text-cyan-300">Terms</Link></li>
             </ul>
           </div>
 

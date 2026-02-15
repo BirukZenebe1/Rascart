@@ -30,6 +30,7 @@ function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [imageConfirmed, setImageConfirmed] = useState(true);
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -150,6 +151,11 @@ function EditProductPage() {
     // Validation
     if (!formData.product_type || !formData.preferred_contact || !formData.payment_method) {
       setError('Type, preferred contact, and payment method are required');
+      setSaving(false);
+      return;
+    }
+    if (!imageConfirmed) {
+      setError('Please confirm the image matches the item name');
       setSaving(false);
       return;
     }
@@ -329,6 +335,15 @@ function EditProductPage() {
                 className="mt-3 h-28 w-28 rounded-md object-cover border"
               />
             )}
+            <label className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={imageConfirmed}
+                onChange={(e) => setImageConfirmed(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+              />
+              I confirm this image matches the product name
+            </label>
           </div>
 
           {/* Image URL */}

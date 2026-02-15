@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -87,6 +87,23 @@ function StyleQuestionnaire() {
   const [error, setError] = useState('');
   const { token, refreshUser, setUser } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadExistingProfile = async () => {
+      try {
+        if (!token) return;
+        const response = await axios.get(apiUrl('/api/style/profile'), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data?.profile?.preferences) {
+          setAnswers(response.data.profile.preferences);
+        }
+      } catch (err) {
+        console.error('Failed to load style profile:', err);
+      }
+    };
+    loadExistingProfile();
+  }, [token]);
  
   const handleAnswer = (value) => {
     setAnswers({
@@ -174,7 +191,11 @@ function StyleQuestionnaire() {
 <button
               key={option.value}
               onClick={() => handleAnswer(option.value)}
-              className="w-full text-left p-3 border rounded-md hover:bg-blue-50 transition"
+              className={`w-full text-left p-3 border rounded-md transition ${
+                answers[styleCategories[currentStep].name] === option.value
+                  ? 'border-cyan-600 bg-cyan-50'
+                  : 'hover:bg-blue-50'
+              }`}
 >
               {option.label}
 </button>

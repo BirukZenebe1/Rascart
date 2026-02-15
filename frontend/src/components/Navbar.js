@@ -10,6 +10,8 @@ function Navbar() {
     username: '',
     userType: ''
   });
+  const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
+  const isAdmin = adminEmail && localStorage.getItem('email')?.toLowerCase() === adminEmail.toLowerCase();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -36,6 +38,7 @@ function Navbar() {
                   <Link to="/seller/products" className="text-slate-700 hover:text-cyan-700 font-medium">My Products</Link>
                   <Link to="/seller/products/add" className="text-slate-700 hover:text-cyan-700 font-medium">Add Product</Link>
                   <Link to="/seller/profile" className="text-slate-700 hover:text-cyan-700 font-medium">Profile</Link>
+                  <Link to="/seller/chats" className="text-slate-700 hover:text-cyan-700 font-medium">Chats</Link>
                 </>
               ) : (
                 <>
@@ -44,6 +47,10 @@ function Navbar() {
                   <Link to="/profile" className="text-slate-700 hover:text-cyan-700 font-medium">Profile</Link>
                 </>
               )}
+              {isAdmin && (
+                <Link to="/admin/promos" className="text-slate-700 hover:text-cyan-700 font-medium">Promos</Link>
+              )}
+              <Link to="/support" className="text-slate-700 hover:text-cyan-700 font-medium">Support</Link>
               <span className="text-sm text-slate-700">Welcome, <b>{state.username}</b></span>
               <span className="text-xs px-2 py-1 bg-cyan-100 text-cyan-800 rounded-full font-semibold">{state.userType === 'seller' ? 'Seller' : 'Customer'}</span>
             </>
@@ -57,6 +64,7 @@ function Navbar() {
                 Shop
               </Link>
               <Link to="/about" className="text-slate-700 hover:text-cyan-700 font-medium">About</Link>
+              <Link to="/support" className="text-slate-700 hover:text-cyan-700 font-medium">Support</Link>
               <Link to="/login" className="text-slate-700 hover:text-cyan-700 font-medium">Login</Link>
               <Link to="/register" className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors">Register</Link>
             </>

@@ -18,6 +18,9 @@ function CheckoutPage() {
     cardExpiry: '',
     cardCvc: ''
   });
+  const [promoCode, setPromoCode] = useState('');
+  const [promoInfo, setPromoInfo] = useState(null);
+  const [promoError, setPromoError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -56,33 +59,62 @@ function CheckoutPage() {
     }));
   };
   
-  const handleSubmit = (e) => {
+  const validatePromo = async () => {
+    if (!promoCode) return;
+    setPromoError('');
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(apiUrl('/api/promos/validate'), { code: promoCode }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPromoInfo(response.data);
+    } catch (error) {
+      setPromoInfo(null);
+      setPromoError(error.response?.data?.error || 'Invalid promo code');
+    }
+  };
+
+  const getDiscountAmount = () => {
+    if (!promoInfo) return 0;
+    const subtotal = getTotalPrice();
+    if (promoInfo.discount_type === 'percent') {
+      return (subtotal * promoInfo.discount_value) / 100;
+    }
+    return promoInfo.discount_value;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!window.confirm('Place this order now?')) {
       setIsSubmitting(false);
       return;
     }
     setIsSubmitting(true);
-    
-    // Simulate order processing
-    setTimeout(() => {
-      // In a real app, you would send this to your backend
-      const orderData = {
-        items: cartItems,
-        totalPrice: getTotalPrice(),
-        shipping: formData,
-        paymentMethod: formData.paymentMethod,
-        orderDate: new Date().toISOString()
-      };
-      
-      console.log('Order placed:', orderData);
-      
-      // Clear cart and redirect to success page
+
+    try {
+      const token = localStorage.getItem('token');
+      const discount = getDiscountAmount();
+      const total = Math.max(0, getTotalPrice() - discount);
+
+      const response = await axios.post(
+        apiUrl('/api/orders'),
+        {
+          items: cartItems,
+          total,
+          payment_method: formData.paymentMethod,
+          promo_code: promoInfo?.code || null,
+          discount
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       clearCart();
-      navigate('/order-success');
-      
+      navigate('/order-success', { state: { orderId: response.data.order_id } });
+    } catch (error) {
+      console.error('Order failed:', error);
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
   
   return (
@@ -222,6 +254,34 @@ function CheckoutPage() {
                 You selected <span className="font-semibold">{formData.paymentMethod.replace('_', ' ')}</span>. You will complete this payment method after placing the order.
               </div>
             )}
+
+            <div className="mt-6 border-t border-slate-200 pt-6">
+              <h2 className="text-lg font-semibold mb-2 text-slate-900">Promo Code</h2>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded-md"
+                  placeholder="Enter code"
+                />
+                <button
+                  type="button"
+                  onClick={validatePromo}
+                  className="px-4 py-2 bg-slate-900 text-white rounded-md"
+                >
+                  Apply
+                </button>
+              </div>
+              {promoInfo && (
+                <div className="mt-2 text-emerald-700 text-sm">
+                  Applied {promoInfo.code} ({promoInfo.discount_type === 'percent' ? `${promoInfo.discount_value}%` : `$${promoInfo.discount_value}`})
+                </div>
+              )}
+              {promoError && (
+                <div className="mt-2 text-red-600 text-sm">{promoError}</div>
+              )}
+            </div>
             
             <button
               type="submit"
@@ -258,13 +318,21 @@ function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>${getTotalPrice().toFixed(2)}</span>
                 </div>
+                {promoInfo && (
+                  <div className="flex justify-between text-emerald-700">
+                    <span>Promo ({promoInfo.code})</span>
+                    <span>- ${getDiscountAmount().toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
                 <div className="border-t border-slate-200 pt-3 font-bold flex justify-between">
                   <span>Total</span>
-                  <span className="text-cyan-700">${getTotalPrice().toFixed(2)}</span>
+                  <span className="text-cyan-700">
+                    ${(Math.max(0, getTotalPrice() - getDiscountAmount())).toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>

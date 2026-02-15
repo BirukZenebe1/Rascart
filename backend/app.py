@@ -51,18 +51,27 @@ from auth import auth_bp
 from style_profile import style_bp
 from product import product_bp
 from seller import seller_bp
+from promos import promos_bp
+from orders import orders_bp
+from messages import messages_bp
 
 # Attach MongoDB to blueprints
 auth_bp.mongo = mongo
 style_bp.mongo = mongo
 product_bp.mongo = mongo
 seller_bp.mongo = mongo
+promos_bp.mongo = mongo
+orders_bp.mongo = mongo
+messages_bp.mongo = mongo
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(style_bp, url_prefix='/api/style')
 app.register_blueprint(product_bp, url_prefix='/api/products')
 app.register_blueprint(seller_bp, url_prefix='/api/seller')
+app.register_blueprint(promos_bp, url_prefix='/api/promos')
+app.register_blueprint(orders_bp, url_prefix='/api/orders')
+app.register_blueprint(messages_bp, url_prefix='/api/messages')
 
 # Test route
 @app.route('/api/test', methods=['GET'])
