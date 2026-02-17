@@ -44,7 +44,10 @@ def list_products():
         per_page = int(request.args.get('per_page', 12))
         
         # Build query filters
-        query = {}
+        query = {
+            'is_active': True,
+            'stock': {'$gt': 0}
+        }
         
         if category:
             query['categories'] = category
@@ -101,7 +104,10 @@ def list_products():
 def get_categories():
     try:
         # Aggregate all unique categories
-        categories = product_bp.mongo.db.products.distinct('categories')
+        categories = product_bp.mongo.db.products.distinct('categories', {
+            'is_active': True,
+            'stock': {'$gt': 0}
+        })
         return jsonify({'categories': categories})
     
     except Exception as e:
@@ -140,7 +146,10 @@ def get_recommendations():
         # Default recommendations if no style profile
         if not user or not user.get('style_profile'):
             # Just return some newest products
-            products = list(product_bp.mongo.db.products.find()
+            products = list(product_bp.mongo.db.products.find({
+                            'is_active': True,
+                            'stock': {'$gt': 0}
+                        })
                             .sort('created_at', -1)
                             .limit(6))
 
@@ -182,6 +191,8 @@ def get_recommendations():
             # Add more color mappings as needed
         
         # Find matching products
+        query['is_active'] = True
+        query['stock'] = {'$gt': 0}
         products = list(product_bp.mongo.db.products.find(query).limit(6))
         
         # If not enough matches, supplement with general products
@@ -189,7 +200,11 @@ def get_recommendations():
             additional_count = 6 - len(products)
             existing_ids = [p['_id'] for p in products]
             additional_products = list(
-                product_bp.mongo.db.products.find({'_id': {'$nin': existing_ids}})
+                product_bp.mongo.db.products.find({
+                    '_id': {'$nin': existing_ids},
+                    'is_active': True,
+                    'stock': {'$gt': 0}
+                })
                 .sort('created_at', -1)
                 .limit(additional_count)
             )

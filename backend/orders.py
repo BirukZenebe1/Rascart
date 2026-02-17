@@ -38,14 +38,31 @@ def create_order_route():
                 {'$inc': {'used_count': 1}}
             )
 
-        # decrement stock
+        # decrement stock and auto-unlist when sold out
         for item in items:
             product_id = item.get('_id') or item.get('id')
             qty = int(item.get('quantity', 1))
             if product_id:
+                product_filter = {'_id': ObjectId(product_id), 'is_active': True}
+                product_doc = orders_bp.mongo.db.products.find_one(product_filter)
+                if not product_doc:
+                    continue
+
+                current_stock = int(product_doc.get('stock', 0))
+                new_stock = max(0, current_stock - qty)
+                updates = {
+                    'stock': new_stock,
+                    'updated_at': datetime.datetime.utcnow()
+                }
+                if new_stock <= 0:
+                    updates['is_active'] = False
+
                 orders_bp.mongo.db.products.update_one(
-                    {'_id': ObjectId(product_id)},
-                    {'$inc': {'stock': -qty, 'sales_count': qty}}
+                    product_filter,
+                    {
+                        '$set': updates,
+                        '$inc': {'sales_count': qty}
+                    }
                 )
 
         orders_bp.mongo.db.users.update_one(
@@ -54,12 +71,22 @@ def create_order_route():
         )
 
         user = orders_bp.mongo.db.users.find_one({'_id': ObjectId(current_user_id)})
+        email_notice = None
         if user and user.get('email'):
             subject = "merkatoAI Order Confirmation"
             body = f"Thanks for your order! Order ID: {result.inserted_id}"
-            send_email(user['email'], subject, body)
+            try:
+                send_email(user['email'], subject, body)
+            except Exception as email_error:
+                email_notice = str(email_error)
 
-        return jsonify({"message": "Order placed", "order_id": str(result.inserted_id)}), 201
+        response_payload = {
+            "message": "Order placed",
+            "order_id": str(result.inserted_id)
+        }
+        if email_notice:
+            response_payload["email_notice"] = "Order placed but confirmation email could not be sent."
+        return jsonify(response_payload), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

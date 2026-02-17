@@ -135,6 +135,8 @@ def profile():
             user['seller_profile'] = str(user['seller_profile'])
         if user.get('style_profile'):
             user['style_profile'] = str(user['style_profile'])
+        if user.get('orders'):
+            user['orders'] = [str(order_id) for order_id in user['orders']]
         if user.get('verification_expires'):
             user['verification_expires'] = user['verification_expires'].isoformat()
         if user.get('reset_expires'):
@@ -208,6 +210,8 @@ def update_profile():
             updated_user['seller_profile'] = str(updated_user['seller_profile'])
         if updated_user.get('style_profile'):
             updated_user['style_profile'] = str(updated_user['style_profile'])
+        if updated_user.get('orders'):
+            updated_user['orders'] = [str(order_id) for order_id in updated_user['orders']]
         if 'created_at' in updated_user:
             updated_user['created_at'] = updated_user['created_at'].isoformat()
         if updated_user.get('verification_expires'):
