@@ -16,6 +16,18 @@ Parameters:
     NoEcho: true
     Default: ''
     Description: Optional OpenAI API key
+  SesFromEmail:
+    Type: String
+    Default: ''
+    Description: Verified SES sender email address
+  SesRegion:
+    Type: String
+    Default: 'eu-central-1'
+    Description: AWS SES region
+  AdminEmail:
+    Type: String
+    Default: ''
+    Description: Admin email allowed to manage promo codes
 
 Globals:
   Function:
@@ -27,6 +39,9 @@ Globals:
         MONGO_URI: !Ref MongoUri
         JWT_SECRET_KEY: !Ref JwtSecretKey
         OPENAI_API_KEY: !Ref OpenAIApiKey
+        SES_FROM_EMAIL: !Ref SesFromEmail
+        SES_REGION: !Ref SesRegion
+        ADMIN_EMAIL: !Ref AdminEmail
 
 Resources:
   BackendApi:

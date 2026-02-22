@@ -22,6 +22,7 @@ function CheckoutPage() {
   const [promoInfo, setPromoInfo] = useState(null);
   const [promoError, setPromoError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     const loadPreferredPaymentMethod = async () => {
@@ -85,6 +86,7 @@ function CheckoutPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
     if (!window.confirm('Place this order now?')) {
       setIsSubmitting(false);
       return;
@@ -103,15 +105,24 @@ function CheckoutPage() {
           total,
           payment_method: formData.paymentMethod,
           promo_code: promoInfo?.code || null,
-          discount
+          discount,
+          customer_email: formData.email
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       clearCart();
-      navigate('/order-success', { state: { orderId: response.data.order_id } });
+      navigate('/order-success', {
+        state: {
+          orderId: response.data.order_id,
+          itemCount: cartItems.reduce((sum, item) => sum + Number(item.quantity || 1), 0),
+          total: total.toFixed(2),
+          emailNotice: response.data.email_notice || ''
+        }
+      });
     } catch (error) {
       console.error('Order failed:', error);
+      setSubmitError(error.response?.data?.error || 'Failed to place order. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -290,6 +301,11 @@ function CheckoutPage() {
             >
               {isSubmitting ? 'Processing...' : 'Place Order'}
             </button>
+            {submitError && (
+              <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {submitError}
+              </div>
+            )}
           </form>
         </div>
         

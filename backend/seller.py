@@ -8,6 +8,7 @@ from models import create_product, create_seller_profile
 
 # Initialize blueprint
 seller_bp = Blueprint('seller', __name__)
+MAX_PRODUCT_IMAGE_BYTES = 3 * 1024 * 1024
 
 def save_product_image(base64_string, filename_prefix='product', host_url=''):
     try:
@@ -23,8 +24,12 @@ def save_product_image(base64_string, filename_prefix='product', host_url=''):
 
         if 'base64,' in base64_string:
             base64_string = base64_string.split('base64,')[1]
+        if not base64_string:
+            return None
 
         image_data = base64.b64decode(base64_string)
+        if len(image_data) > MAX_PRODUCT_IMAGE_BYTES:
+            return None
         timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"{filename_prefix}_{timestamp}.png"
         filepath = os.path.join(upload_folder, filename)

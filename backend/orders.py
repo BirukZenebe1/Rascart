@@ -18,6 +18,7 @@ def create_order_route():
         payment_method = data.get('payment_method')
         promo_code = data.get('promo_code')
         discount = data.get('discount', 0)
+        customer_email = (data.get('customer_email') or '').strip().lower()
 
         if not items or total is None or not payment_method:
             return jsonify({"error": "Missing order fields"}), 400
@@ -72,20 +73,39 @@ def create_order_route():
 
         user = orders_bp.mongo.db.users.find_one({'_id': ObjectId(current_user_id)})
         email_notice = None
-        if user and user.get('email'):
+        recipient_email = customer_email or (user.get('email') if user else None)
+        if recipient_email:
             subject = "merkatoAI Order Confirmation"
-            body = f"Thanks for your order! Order ID: {result.inserted_id}"
+            item_lines = []
+            for item in items:
+                item_name = item.get('name', 'Item')
+                qty = int(item.get('quantity', 1))
+                price = float(item.get('price', 0))
+                item_lines.append(f"- {item_name} x{qty}: ${price * qty:.2f}")
+            body = (
+                f"Your order has been placed successfully.\n\n"
+                f"Order ID: {result.inserted_id}\n"
+                f"Payment Method: {payment_method}\n"
+                f"Subtotal: ${float(total) + float(discount):.2f}\n"
+                f"Discount: -${float(discount):.2f}\n"
+                f"Total Paid: ${float(total):.2f}\n\n"
+                f"Items:\n" + "\n".join(item_lines) + "\n\n"
+                f"Thank you for shopping on merkatoAI."
+            )
             try:
-                send_email(user['email'], subject, body)
+                send_email(recipient_email, subject, body)
             except Exception as email_error:
                 email_notice = str(email_error)
 
         response_payload = {
-            "message": "Order placed",
+            "message": "Order placed successfully",
             "order_id": str(result.inserted_id)
         }
         if email_notice:
             response_payload["email_notice"] = "Order placed but confirmation email could not be sent."
+            response_payload["email_error"] = email_notice
+        else:
+            response_payload["email_notice"] = "Order confirmation email sent."
         return jsonify(response_payload), 201
 
     except Exception as e:

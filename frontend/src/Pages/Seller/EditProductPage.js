@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../../config';
+import { MAX_IMAGE_SIZE_BYTES, optimizeImageFile } from '../../utils/imageUpload';
 
 function EditProductPage() {
   const navigate = useNavigate();
@@ -86,21 +87,34 @@ function EditProductPage() {
     });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result;
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Image is too large. Please use an image smaller than 8MB');
+      return;
+    }
+    try {
+      const optimized = await optimizeImageFile(file, 1200, 0.82);
+      if (!optimized || optimized.length > (MAX_IMAGE_SIZE_BYTES * 1.45)) {
+        setError('Image is still too large after optimization. Please choose a smaller image.');
+        return;
+      }
+      setError('');
       setFormData({
         ...formData,
-        image_data: base64,
+        image_data: optimized,
         image_url: ''
       });
-      setImagePreview(base64);
-    };
-    reader.readAsDataURL(file);
+      setImagePreview(optimized);
+    } catch (uploadError) {
+      setError('Failed to process image. Please try another file.');
+    }
   };
 
   const addCategory = () => {

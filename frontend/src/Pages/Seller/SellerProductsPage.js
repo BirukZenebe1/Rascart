@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../../config';
 
 function SellerProductsPage() {
+  const location = useLocation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const metric = new URLSearchParams(location.search).get('metric') || 'total';
 
   useEffect(() => {
     fetchProducts();
@@ -25,6 +27,27 @@ function SellerProductsPage() {
       setLoading(false);
     }
   };
+
+  const monitoredProducts = React.useMemo(() => {
+    const list = [...products];
+    if (metric === 'active') {
+      return list.filter((product) => product.is_active);
+    }
+    if (metric === 'views') {
+      return list.sort((a, b) => Number(b.views || 0) - Number(a.views || 0));
+    }
+    if (metric === 'sales') {
+      return list.sort((a, b) => Number(b.sales_count || 0) - Number(a.sales_count || 0));
+    }
+    return list;
+  }, [products, metric]);
+
+  const monitorLabel = {
+    total: 'Monitoring total products',
+    active: 'Monitoring active products',
+    views: 'Monitoring product views',
+    sales: 'Monitoring product sales'
+  }[metric] || 'Monitoring total products';
 
   const handleDelete = async (productId) => {
     if (!window.confirm('Are you sure you want to delete this product?')) {
@@ -90,7 +113,11 @@ function SellerProductsPage() {
         </div>
       )}
 
-      {products.length === 0 ? (
+      <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-medium text-cyan-800">
+        {monitorLabel}
+      </div>
+
+      {monitoredProducts.length === 0 ? (
         <div className="bg-gray-100 p-12 rounded-lg text-center">
           <h3 className="text-xl font-medium text-gray-700 mb-2">No products yet</h3>
           <p className="text-gray-500 mb-4">Start by adding your first product</p>
@@ -139,7 +166,7 @@ function SellerProductsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
+              {monitoredProducts.map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

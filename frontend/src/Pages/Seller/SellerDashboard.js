@@ -56,11 +56,12 @@ function SellerDashboard() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow">
+        <Link to="/seller/products?metric=total" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-transparent hover:border-cyan-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Products</p>
               <p className="text-3xl font-bold mt-1">{stats?.total_products || 0}</p>
+              <p className="text-xs text-cyan-700 mt-2 font-semibold">Open monitor</p>
             </div>
             <div className="bg-blue-100 p-3 rounded-full">
               <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,13 +69,14 @@ function SellerDashboard() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white p-6 rounded-lg shadow">
+        <Link to="/seller/products?metric=active" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-transparent hover:border-cyan-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Active Products</p>
               <p className="text-3xl font-bold mt-1">{stats?.active_products || 0}</p>
+              <p className="text-xs text-cyan-700 mt-2 font-semibold">Open monitor</p>
             </div>
             <div className="bg-green-100 p-3 rounded-full">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,13 +84,14 @@ function SellerDashboard() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white p-6 rounded-lg shadow">
+        <Link to="/seller/products?metric=views" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-transparent hover:border-cyan-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Views</p>
               <p className="text-3xl font-bold mt-1">{stats?.total_views || 0}</p>
+              <p className="text-xs text-cyan-700 mt-2 font-semibold">Open monitor</p>
             </div>
             <div className="bg-purple-100 p-3 rounded-full">
               <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,13 +100,14 @@ function SellerDashboard() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white p-6 rounded-lg shadow">
+        <Link to="/seller/products?metric=sales" className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-transparent hover:border-cyan-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Sales</p>
               <p className="text-3xl font-bold mt-1">{stats?.total_sales || 0}</p>
+              <p className="text-xs text-cyan-700 mt-2 font-semibold">Open monitor</p>
             </div>
             <div className="bg-yellow-100 p-3 rounded-full">
               <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +115,7 @@ function SellerDashboard() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Quick Actions */}

@@ -4,6 +4,9 @@ import { Link, useLocation } from 'react-router-dom';
 function OrderSuccessPage() {
   const location = useLocation();
   const orderId = location.state?.orderId;
+  const itemCount = location.state?.itemCount;
+  const total = location.state?.total;
+  const emailNotice = location.state?.emailNotice;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
@@ -13,13 +16,19 @@ function OrderSuccessPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
           
-          <h1 className="mt-4 text-3xl font-black text-slate-900">Order Successful!</h1>
+          <h1 className="mt-4 text-3xl font-black text-slate-900">Order Successful</h1>
           <p className="mt-2 text-lg text-slate-600">Thank you for your purchase.</p>
-          <p className="text-slate-500">Your order has been placed and will be processed soon.</p>
+          <p className="text-slate-500">We received your order and started processing it.</p>
           {orderId && (
             <p className="text-slate-700 mt-2">Order ID: <span className="font-semibold">{orderId}</span></p>
           )}
-          <p className="text-slate-500 mt-2">A confirmation email has been sent to your inbox.</p>
+          {(itemCount || total) && (
+            <div className="mt-4 rounded-xl border border-cyan-200 bg-cyan-50 text-cyan-900 px-4 py-3 text-sm">
+              {itemCount ? <div>{itemCount} item{itemCount > 1 ? 's' : ''} confirmed</div> : null}
+              {total ? <div>Total charged: ${total}</div> : null}
+            </div>
+          )}
+          <p className="text-slate-500 mt-3">{emailNotice || 'A confirmation email has been sent to your inbox.'}</p>
           
           <div className="mt-8 flex justify-center space-x-4">
             <Link 
@@ -29,10 +38,10 @@ function OrderSuccessPage() {
               Go to Home
             </Link>
             <Link 
-              to="/shop"
+              to="/profile"
               className="px-5 py-3 bg-slate-100 text-slate-800 rounded-lg hover:bg-slate-200 transition-colors"
             >
-              Continue Shopping
+              View Orders
             </Link>
           </div>
         </div>

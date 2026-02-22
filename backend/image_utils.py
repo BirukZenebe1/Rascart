@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 
 # Allowed image extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_IMAGE_BYTES = 3 * 1024 * 1024
 
 def allowed_file(filename):
     """Check if file has an allowed extension"""
@@ -30,9 +31,13 @@ def save_base64_image(base64_string, filename_prefix='profile'):
         # Remove data URL prefix if present
         if 'base64,' in base64_string:
             base64_string = base64_string.split('base64,')[1]
+        if not base64_string:
+            return None
         
         # Decode base64 string
         image_data = base64.b64decode(base64_string)
+        if len(image_data) > MAX_IMAGE_BYTES:
+            return None
         
         # Generate unique filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

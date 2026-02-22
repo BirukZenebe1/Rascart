@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../../config';
+import { MAX_IMAGE_SIZE_BYTES, optimizeImageFile } from '../../utils/imageUpload';
 
 function AddProductPage() {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ function AddProductPage() {
     });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -56,23 +57,26 @@ function AddProductPage() {
       setError('Please select a valid image file');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Image must be less than 2MB');
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Image is too large. Please use an image smaller than 8MB');
       return;
     }
-    setError('');
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result;
+    try {
+      const optimized = await optimizeImageFile(file, 1200, 0.82);
+      if (!optimized || optimized.length > (MAX_IMAGE_SIZE_BYTES * 1.45)) {
+        setError('Image is still too large after optimization. Please choose a smaller image.');
+        return;
+      }
+      setError('');
       setFormData({
         ...formData,
-        image_data: base64,
+        image_data: optimized,
         image_url: ''
       });
-      setImagePreview(base64);
-    };
-    reader.readAsDataURL(file);
+      setImagePreview(optimized);
+    } catch (uploadError) {
+      setError('Failed to process image. Please try a different image.');
+    }
   };
 
   const addCategory = () => {
@@ -304,7 +308,7 @@ function AddProductPage() {
               onChange={handleImageUpload}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             />
-            <p className="text-xs text-slate-500 mt-2">Max size 2MB. Recommended square image.</p>
+            <p className="text-xs text-slate-500 mt-2">Auto-optimized to improve upload reliability. Recommended square image.</p>
             {imagePreview && (
               <img
                 src={imagePreview}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import basketLogo from '../assets/gebeya-basket-logo.svg';
+import { apiUrl } from '../config';
 
 function Navbar() {
   const location = useLocation();
@@ -8,18 +10,38 @@ function Navbar() {
   const [state, setState] = useState({
     isLoggedIn: false,
     username: '',
-    userType: ''
+    userType: '',
+    unreadChats: 0
   });
   const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
   const isAdmin = adminEmail && localStorage.getItem('email')?.toLowerCase() === adminEmail.toLowerCase();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setState({
-      isLoggedIn: !!token,
-      username: localStorage.getItem('username') || '',
-      userType: localStorage.getItem('userType') || 'buyer'
-    });
+    const syncState = async () => {
+      const token = localStorage.getItem('token');
+      const nextState = {
+        isLoggedIn: !!token,
+        username: localStorage.getItem('username') || '',
+        userType: localStorage.getItem('userType') || 'buyer',
+        unreadChats: 0
+      };
+
+      if (token && nextState.userType === 'seller') {
+        try {
+          const response = await axios.get(apiUrl('/api/messages/threads'), {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const threads = response.data.threads || [];
+          nextState.unreadChats = threads.reduce((sum, thread) => sum + Number(thread.unread_count || 0), 0);
+        } catch (error) {
+          nextState.unreadChats = 0;
+        }
+      }
+
+      setState(nextState);
+    };
+
+    syncState();
   }, [location.pathname]);
 
   return (
@@ -38,7 +60,14 @@ function Navbar() {
                   <Link to="/seller/products" className="text-slate-700 hover:text-cyan-700 font-medium">My Products</Link>
                   <Link to="/seller/products/add" className="text-slate-700 hover:text-cyan-700 font-medium">Add Product</Link>
                   <Link to="/seller/profile" className="text-slate-700 hover:text-cyan-700 font-medium">Profile</Link>
-                  <Link to="/seller/chats" className="text-slate-700 hover:text-cyan-700 font-medium">Chats</Link>
+                  <Link to="/seller/chats" className="relative text-slate-700 hover:text-cyan-700 font-medium">
+                    Chats
+                    {state.unreadChats > 0 && (
+                      <span className="ml-2 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        {state.unreadChats}
+                      </span>
+                    )}
+                  </Link>
                 </>
               ) : (
                 <>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL, apiUrl } from '../config';
+import { MAX_IMAGE_SIZE_BYTES, optimizeImageFile } from '../utils/imageUpload';
 
 function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
   const [uploading, setUploading] = useState(false);
@@ -11,7 +12,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
     setPreview(currentPhoto);
   }, [currentPhoto]);
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
@@ -20,48 +21,43 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
         return;
       }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Image size must be less than 5MB');
+      // Validate file size before compression
+      if (file.size > 8 * 1024 * 1024) {
+        alert('Image is too large. Please use an image smaller than 8MB.');
         return;
       }
 
-      // Show preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-
-      // Upload image
-      uploadImage(file);
+      try {
+        const optimized = await optimizeImageFile(file, 800, 0.85);
+        if (!optimized || optimized.length > (MAX_IMAGE_SIZE_BYTES * 1.45)) {
+          alert('Image is still too large after optimization. Please choose a smaller image.');
+          return;
+        }
+        setPreview(optimized);
+        uploadImage(optimized);
+      } catch (error) {
+        alert('Failed to process image');
+      }
     }
   };
 
-  const uploadImage = async (file) => {
+  const uploadImage = async (base64Image) => {
     setUploading(true);
 
     try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result;
-
-        const token = localStorage.getItem('token');
-        const response = await axios.post(
-          apiUrl('/api/auth/profile/photo'),
-          { image: base64String },
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-
-        if (response.data.profile_photo) {
-          onPhotoUpdate(response.data.profile_photo);
-          alert('Profile photo updated successfully!');
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        apiUrl('/api/auth/profile/photo'),
+        { image: base64Image },
+        {
+          headers: { Authorization: `Bearer ${token}` }
         }
-      };
-      reader.readAsDataURL(file);
+      );
+
+      if (response.data.profile_photo) {
+        onPhotoUpdate(response.data.profile_photo);
+        alert('Profile photo updated successfully!');
+      }
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to upload image');
       setPreview(currentPhoto); // Reset to original
@@ -166,7 +162,7 @@ function ProfilePhotoUpload({ currentPhoto, onPhotoUpdate }) {
       </div>
 
       <p className="text-xs text-gray-500 mt-2">
-        Max size: 5MB. Formats: JPG, PNG, GIF
+        Max optimized upload: 3MB. Formats: JPG, PNG, GIF, WEBP
       </p>
     </div>
   );
