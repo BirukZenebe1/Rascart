@@ -88,6 +88,21 @@ function LoginPage() {
             </div>
           )}
 
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-slate-500 tracking-wide">or continue with</span>
+            </div>
+          </div>
+
+          <SocialAuthButtons
+            userType={defaultUserType}
+            onAuthSuccess={(payload) => persistSessionAndNavigate(payload, '')}
+            onError={(messageText) => setError(messageText)}
+          />
+
           <div>
             <label htmlFor="email" className="block text-sm font-semibold text-slate-700">
               Email address
@@ -132,20 +147,6 @@ function LoginPage() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
 
-          <div className="relative py-1">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500 tracking-wide">or continue with</span>
-            </div>
-          </div>
-
-          <SocialAuthButtons
-            userType={defaultUserType}
-            onAuthSuccess={(payload) => persistSessionAndNavigate(payload, '')}
-            onError={(messageText) => setError(messageText)}
-          />
         </form>
       </div>
     </div>

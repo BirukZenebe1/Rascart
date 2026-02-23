@@ -203,6 +203,15 @@ def oauth_google():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@auth_bp.route('/oauth/config', methods=['GET'])
+def oauth_config():
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
+    return jsonify({
+        "google_client_id": google_client_id,
+        "google_enabled": bool(google_client_id),
+        "apple_enabled": False
+    }), 200
+
 @auth_bp.route('/oauth/apple', methods=['POST'])
 def oauth_apple():
     return jsonify({

@@ -168,6 +168,21 @@ function RegisterPage() {
             </div>
           </div>
 
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-slate-500 tracking-wide">or continue with</span>
+            </div>
+          </div>
+
+          <SocialAuthButtons
+            userType={formData.userType}
+            onAuthSuccess={(payload) => persistSessionAndNavigate(payload)}
+            onError={(messageText) => setError(messageText)}
+          />
+
           <div>
             <label htmlFor="username" className="block text-sm font-semibold text-slate-700">
               Username
@@ -249,20 +264,6 @@ function RegisterPage() {
             {loading ? 'Creating account...' : 'Create account'}
           </button>
 
-          <div className="relative py-1">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500 tracking-wide">or continue with</span>
-            </div>
-          </div>
-
-          <SocialAuthButtons
-            userType={formData.userType}
-            onAuthSuccess={(payload) => persistSessionAndNavigate(payload)}
-            onError={(messageText) => setError(messageText)}
-          />
           </form>
         ) : (
           <form className="mt-8 space-y-6" onSubmit={handleVerify}>

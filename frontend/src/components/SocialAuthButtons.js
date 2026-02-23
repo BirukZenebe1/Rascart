@@ -8,10 +8,35 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
   const googleButtonRef = useRef(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  const [googleClientId, setGoogleClientId] = useState(process.env.REACT_APP_GOOGLE_CLIENT_ID || '');
+  const [googleConfigLoaded, setGoogleConfigLoaded] = useState(false);
 
   useEffect(() => {
-    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    const loadGoogleConfig = async () => {
+      if (googleClientId) {
+        setGoogleConfigLoaded(true);
+        return;
+      }
+      try {
+        const response = await axios.get(apiUrl('/api/auth/oauth/config'));
+        const runtimeClientId = response.data?.google_client_id || '';
+        if (runtimeClientId) {
+          setGoogleClientId(runtimeClientId);
+        }
+      } catch (error) {
+        // Keep fallback UX if config endpoint is unavailable.
+      } finally {
+        setGoogleConfigLoaded(true);
+      }
+    };
+
+    loadGoogleConfig();
+  }, [googleClientId]);
+
+  useEffect(() => {
+    const clientId = googleClientId;
     if (!clientId) {
+      setGoogleReady(false);
       return;
     }
 
@@ -47,7 +72,7 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
     script.onload = initGoogle;
     document.body.appendChild(script);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userType]);
+  }, [googleClientId, userType]);
 
   const handleGoogleCredential = async (response) => {
     if (!response?.credential) {
@@ -89,9 +114,12 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
       ) : (
         <button
           type="button"
-          onClick={() => onError?.('Google Sign-In is not configured. Set REACT_APP_GOOGLE_CLIENT_ID.')}
+          onClick={() => {
+            if (!googleConfigLoaded) return;
+            onError?.('Google Sign-In is not configured yet.');
+          }}
           className="w-full inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          disabled={authLoading}
+          disabled={authLoading || !googleConfigLoaded}
         >
           Continue with Google
         </button>
