@@ -60,7 +60,11 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
 
     const existingScript = document.getElementById(GOOGLE_SCRIPT_ID);
     if (existingScript) {
-      initGoogle();
+      if (window.google?.accounts?.id) {
+        initGoogle();
+      } else {
+        existingScript.addEventListener('load', initGoogle, { once: true });
+      }
       return;
     }
 
@@ -116,7 +120,7 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
           type="button"
           onClick={() => {
             if (!googleConfigLoaded) return;
-            onError?.('Google Sign-In is not configured yet.');
+            onError?.('Google Sign-In is temporarily unavailable. Please disable content blockers and refresh.');
           }}
           className="w-full inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           disabled={authLoading || !googleConfigLoaded}
