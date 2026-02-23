@@ -132,7 +132,7 @@ function ProductDetailPage() {
     }
   };
   
-  const handleAddToCart = () => {
+  const addToCart = () => {
     if (cart?.addToCart) {
       cart.addToCart(product, quantity);
     } else {
@@ -148,7 +148,19 @@ function ProductDetailPage() {
       }
       localStorage.setItem('cart', JSON.stringify(savedCart));
     }
+  };
+
+  const handleAddToCart = () => {
+    addToCart();
     alert(`Added ${quantity} of ${product.name} to cart`);
+  };
+
+  const handleProceedToCheckout = () => {
+    if (!window.confirm('Proceed to checkout?')) {
+      return;
+    }
+    addToCart();
+    navigate('/checkout');
   };
 
   const handleSendMessage = async () => {
@@ -330,12 +342,20 @@ function ProductDetailPage() {
           </div>
           
           {!isSeller && (
-            <button
-              onClick={handleAddToCart}
-              className="mt-6 w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
-            >
-              Add to Cart
-            </button>
+            <>
+              <button
+                onClick={handleProceedToCheckout}
+                className="mt-6 w-full bg-cyan-600 text-white py-3 rounded-lg hover:bg-cyan-700 transition-colors font-semibold"
+              >
+                Proceed to Checkout
+              </button>
+              <button
+                onClick={handleAddToCart}
+                className="mt-3 w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
+              >
+                Add to Cart
+              </button>
+            </>
           )}
           
           {/* Back to Shop */}
