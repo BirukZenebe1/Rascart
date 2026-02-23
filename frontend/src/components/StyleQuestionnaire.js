@@ -106,14 +106,14 @@ function StyleQuestionnaire() {
   }, [token]);
  
   const handleAnswer = (value) => {
-    setAnswers({
-      ...answers,
-      [styleCategories[currentStep].name]: value
-    });
+    const currentCategory = styleCategories[currentStep].name;
+    setAnswers((prev) => ({
+      ...prev,
+      [currentCategory]: value
+    }));
+
     if (currentStep < styleCategories.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      handleSubmit();
     }
   };
  
@@ -124,6 +124,12 @@ function StyleQuestionnaire() {
   };
  
   const handleSubmit = async () => {
+    const currentCategory = styleCategories[currentStep].name;
+    if (!answers[currentCategory]) {
+      setError('Please select an option before continuing.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     try {
@@ -168,6 +174,8 @@ function StyleQuestionnaire() {
   // If we've completed all steps but not submitted yet
   const isLastStep = currentStep === styleCategories.length - 1;
  
+  const hasCurrentSelection = Boolean(answers[styleCategories[currentStep].name]);
+
   // Calculate progress percentage
   const progress = ((currentStep + 1) / styleCategories.length) * 100;
  
@@ -218,8 +226,8 @@ function StyleQuestionnaire() {
         {isLastStep && (
 <button
             onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
+            disabled={isSubmitting || !hasCurrentSelection}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
 >
             {isSubmitting ? 'Analyzing...' : 'Create Style Profile'}
 </button>

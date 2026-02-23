@@ -18,13 +18,13 @@ def create_or_update_profile():
         current_user_id = get_jwt_identity()
         
         # Get profile data from request
-        data = request.get_json()
-        
-        print(f"Received style preferences: {data['preferences']}")
+        data = request.get_json() or {}
         
         # Check if required fields are present
         if 'preferences' not in data:
             return jsonify({"error": "Missing preferences data"}), 400
+
+        print(f"Received style preferences: {data['preferences']}")
         
         # Get or create style profile
         existing_profile = style_bp.mongo.db.style_profiles.find_one(
