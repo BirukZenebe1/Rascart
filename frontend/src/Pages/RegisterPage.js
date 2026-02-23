@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../config';
+import SocialAuthButtons from '../components/SocialAuthButtons';
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,22 @@ function RegisterPage() {
   const [verificationStep, setVerificationStep] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
+
+  const persistSessionAndNavigate = (payload) => {
+    localStorage.setItem('token', payload.token);
+    localStorage.setItem('userId', payload.user_id);
+    localStorage.setItem('username', payload.username);
+    localStorage.setItem('userType', payload.user_type);
+    localStorage.setItem('email', payload.email || '');
+    if (payload.profile_photo) {
+      localStorage.setItem('profilePhoto', payload.profile_photo);
+    }
+    if (payload.user_type === 'seller') {
+      navigate('/seller/dashboard');
+      return;
+    }
+    navigate('/shop');
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -231,6 +248,21 @@ function RegisterPage() {
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
+
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-slate-500 tracking-wide">or continue with</span>
+            </div>
+          </div>
+
+          <SocialAuthButtons
+            userType={formData.userType}
+            onAuthSuccess={(payload) => persistSessionAndNavigate(payload)}
+            onError={(messageText) => setError(messageText)}
+          />
           </form>
         ) : (
           <form className="mt-8 space-y-6" onSubmit={handleVerify}>

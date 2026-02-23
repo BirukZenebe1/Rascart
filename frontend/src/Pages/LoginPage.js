@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../config';
+import SocialAuthButtons from '../components/SocialAuthButtons';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,25 @@ function LoginPage() {
 
   const message = location.state?.message;
   const redirectPath = location.state?.from || '/shop';
+  const defaultUserType = location.state?.userType || 'buyer';
+
+  const persistSessionAndNavigate = (payload, fallbackEmail = '') => {
+    localStorage.setItem('token', payload.token);
+    localStorage.setItem('userId', payload.user_id);
+    localStorage.setItem('username', payload.username);
+    localStorage.setItem('userType', payload.user_type);
+    localStorage.setItem('email', payload.email || fallbackEmail);
+
+    if (payload.profile_photo) {
+      localStorage.setItem('profilePhoto', payload.profile_photo);
+    }
+
+    if (payload.user_type === 'seller') {
+      navigate('/seller/dashboard');
+      return;
+    }
+    navigate(redirectPath);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,24 +46,7 @@ function LoginPage() {
       });
 
       if (response.data.token) {
-        // Store token and user info
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userId', response.data.user_id);
-        localStorage.setItem('username', response.data.username);
-        localStorage.setItem('userType', response.data.user_type);
-        localStorage.setItem('email', response.data.email || email);
-        
-        // Store profile photo if available
-        if (response.data.profile_photo) {
-          localStorage.setItem('profilePhoto', response.data.profile_photo);
-        }
-
-        // Redirect based on user type
-        if (response.data.user_type === 'seller') {
-          navigate('/seller/dashboard');
-        } else {
-          navigate(redirectPath);
-        }
+        persistSessionAndNavigate(response.data, email);
       }
     } catch (err) {
       if (err.response?.data?.verification_required) {
@@ -128,6 +131,21 @@ function LoginPage() {
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
+
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-slate-500 tracking-wide">or continue with</span>
+            </div>
+          </div>
+
+          <SocialAuthButtons
+            userType={defaultUserType}
+            onAuthSuccess={(payload) => persistSessionAndNavigate(payload, '')}
+            onError={(messageText) => setError(messageText)}
+          />
         </form>
       </div>
     </div>

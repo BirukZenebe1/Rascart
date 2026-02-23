@@ -8,10 +8,44 @@ from image_utils import save_base64_image, delete_image
 from email_utils import send_email
 import os
 import random
+import re
+import secrets
+import requests
 
 # Initialize blueprint and bcrypt
 auth_bp = Blueprint('auth', __name__)
 bcrypt = Bcrypt()
+GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
+
+def _issue_auth_response(user):
+    expires = datetime.timedelta(days=1)
+    access_token = create_access_token(
+        identity=str(user['_id']),
+        expires_delta=expires
+    )
+    return {
+        "message": "Login successful",
+        "token": access_token,
+        "user_id": str(user['_id']),
+        "username": user['username'],
+        "email": user['email'],
+        "user_type": user.get('user_type', 'buyer'),
+        "profile_photo": user.get('profile_photo', None)
+    }
+
+def _generate_unique_username(email, preferred_username=None):
+    base_username = preferred_username or (email.split('@')[0] if email else "user")
+    base_username = re.sub(r'[^a-zA-Z0-9_]', '', base_username)[:18] or "user"
+    candidate = base_username
+    attempt = 0
+    while auth_bp.mongo.db.users.find_one({'username': candidate}):
+        attempt += 1
+        candidate = f"{base_username}{attempt}"
+        if attempt > 100:
+            candidate = f"user{random.randint(1000, 9999)}"
+            if not auth_bp.mongo.db.users.find_one({'username': candidate}):
+                break
+    return candidate
 
 def _generate_code():
     return str(random.randint(100000, 999999))
@@ -96,26 +130,84 @@ def login():
         if user and bcrypt.check_password_hash(user['password'], data['password']):
             if not user.get('is_verified'):
                 return jsonify({"error": "Email not verified", "verification_required": True}), 403
-            expires = datetime.timedelta(days=1)
-            access_token = create_access_token(
-                identity=str(user['_id']),
-                expires_delta=expires
-            )
-            
-            return jsonify({
-                "message": "Login successful",
-                "token": access_token,
-                "user_id": str(user['_id']),
-                "username": user['username'],
-                "email": user['email'],
-                "user_type": user.get('user_type', 'buyer'),
-                "profile_photo": user.get('profile_photo', None)
-            }), 200
+            return jsonify(_issue_auth_response(user)), 200
         else:
             return jsonify({"error": "Invalid email or password"}), 401
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@auth_bp.route('/oauth/google', methods=['POST'])
+def oauth_google():
+    try:
+        data = request.get_json() or {}
+        id_token = data.get('id_token') or data.get('credential')
+        user_type = data.get('user_type', 'buyer')
+        if user_type not in ['buyer', 'seller']:
+            user_type = 'buyer'
+
+        if not id_token:
+            return jsonify({"error": "Google ID token is required"}), 400
+
+        token_check = requests.get(
+            GOOGLE_TOKENINFO_URL,
+            params={"id_token": id_token},
+            timeout=10
+        )
+        if token_check.status_code != 200:
+            return jsonify({"error": "Invalid Google token"}), 401
+
+        payload = token_check.json()
+        expected_aud = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
+        if expected_aud and payload.get('aud') != expected_aud:
+            return jsonify({"error": "Google token audience mismatch"}), 401
+
+        email = payload.get('email', '').strip().lower()
+        email_verified = str(payload.get('email_verified', 'false')).lower() == 'true'
+        if not email or not email_verified:
+            return jsonify({"error": "Google account email is not verified"}), 400
+
+        user = auth_bp.mongo.db.users.find_one({'email': email})
+        if user:
+            updates = {
+                'is_verified': True,
+                'oauth_provider': 'google'
+            }
+            if not user.get('profile_photo') and payload.get('picture'):
+                updates['profile_photo'] = payload.get('picture')
+            auth_bp.mongo.db.users.update_one({'_id': user['_id']}, {'$set': updates})
+            user = auth_bp.mongo.db.users.find_one({'_id': user['_id']})
+            return jsonify(_issue_auth_response(user)), 200
+
+        preferred_username = payload.get('name') or payload.get('given_name')
+        username = _generate_unique_username(email, preferred_username)
+        random_password = secrets.token_urlsafe(24)
+        password_hash = bcrypt.generate_password_hash(random_password).decode('utf-8')
+
+        new_user = create_user(
+            username=username,
+            email=email,
+            password_hash=password_hash,
+            user_type=user_type
+        )
+        new_user['is_verified'] = True
+        new_user['oauth_provider'] = 'google'
+        if payload.get('picture'):
+            new_user['profile_photo'] = payload.get('picture')
+
+        inserted_id = auth_bp.mongo.db.users.insert_one(new_user).inserted_id
+        user = auth_bp.mongo.db.users.find_one({'_id': inserted_id})
+        return jsonify(_issue_auth_response(user)), 200
+    except requests.RequestException:
+        return jsonify({"error": "Unable to verify Google token"}), 503
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@auth_bp.route('/oauth/apple', methods=['POST'])
+def oauth_apple():
+    return jsonify({
+        "error": "Apple Sign-In is not configured yet. Add Apple OAuth credentials and enable it in backend."
+    }), 501
 
 # Get current user profile
 @auth_bp.route('/profile', methods=['GET'])
