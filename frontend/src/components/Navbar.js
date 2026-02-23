@@ -26,7 +26,7 @@ function Navbar() {
         unreadChats: 0
       };
 
-      if (token && nextState.userType === 'seller') {
+      if (token) {
         try {
           const response = await axios.get(apiUrl('/api/messages/threads'), {
             headers: { Authorization: `Bearer ${token}` }
@@ -73,6 +73,14 @@ function Navbar() {
                 <>
                   <Link to="/shop" className="text-slate-700 hover:text-cyan-700 font-medium">Shop</Link>
                   <Link to="/cart" className="text-slate-700 hover:text-cyan-700 font-medium">Cart</Link>
+                  <Link to="/chats" className="relative text-slate-700 hover:text-cyan-700 font-medium">
+                    Chats
+                    {state.unreadChats > 0 && (
+                      <span className="ml-2 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        {state.unreadChats}
+                      </span>
+                    )}
+                  </Link>
                   <Link to="/profile" className="text-slate-700 hover:text-cyan-700 font-medium">Profile</Link>
                 </>
               )}

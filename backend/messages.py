@@ -180,6 +180,7 @@ def list_threads():
 
     product_ids = [t.get('product_id') for t in threads if t.get('product_id')]
     buyer_ids = [t.get('buyer_id') for t in threads if t.get('buyer_id')]
+    seller_ids = [t.get('seller_id') for t in threads if t.get('seller_id')]
 
     products = {}
     if product_ids:
@@ -191,16 +192,24 @@ def list_threads():
         buyer_docs = messages_bp.mongo.db.users.find({'_id': {'$in': buyer_ids}})
         buyers = {str(u['_id']): u for u in buyer_docs}
 
+    sellers = {}
+    if seller_ids:
+        seller_docs = messages_bp.mongo.db.users.find({'_id': {'$in': seller_ids}})
+        sellers = {str(u['_id']): u for u in seller_docs}
+
     serialized_threads = []
     for thread in threads:
         serialized = _serialize_thread(thread, current_user_id)
         product = products.get(serialized['product_id'])
         buyer = buyers.get(serialized['buyer_id'])
+        seller = sellers.get(serialized['seller_id'])
         if product:
             serialized['product_name'] = product.get('name', 'Product')
             serialized['product_image'] = product.get('image_url')
         if buyer:
             serialized['buyer_username'] = buyer.get('username', 'Buyer')
+        if seller:
+            serialized['seller_username'] = seller.get('username', 'Seller')
         serialized_threads.append(serialized)
 
     return jsonify({"threads": serialized_threads}), 200

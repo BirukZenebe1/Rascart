@@ -73,6 +73,11 @@ function App() {
               </PrivateRoute>
             } />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/chats" element={
+              <PrivateRoute>
+                <SellerChatsPage />
+              </PrivateRoute>
+            } />
             
             {/* Seller Routes (Protected) */}
             <Route path="/seller/dashboard" element={
