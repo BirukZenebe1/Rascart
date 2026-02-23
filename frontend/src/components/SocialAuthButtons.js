@@ -113,8 +113,23 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
 
   return (
     <div className="space-y-3">
-      {googleReady ? (
-        <div ref={googleButtonRef} className="flex justify-center" />
+      {googleClientId ? (
+        <div>
+          <div
+            ref={googleButtonRef}
+            className={`flex justify-center ${googleReady ? '' : 'hidden'}`}
+          />
+          {!googleReady && (
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="w-full inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              disabled={authLoading || !googleConfigLoaded}
+            >
+              Continue with Google
+            </button>
+          )}
+        </div>
       ) : (
         <button
           type="button"
