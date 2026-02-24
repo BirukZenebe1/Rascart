@@ -20,6 +20,9 @@ function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [similarLoading, setSimilarLoading] = useState(false);
+  const [thread, setThread] = useState(null);
+  const [chatText, setChatText] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -107,6 +110,21 @@ function ProductDetailPage() {
     fetchSimilarProducts();
   }, [product]);
 
+  useEffect(() => {
+    const fetchThread = async () => {
+      if (!token || !productId) return;
+      try {
+        const response = await axios.get(apiUrl(`/api/messages/thread/${productId}`), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setThread(response.data.thread);
+      } catch (err) {
+        console.error('Failed to load chat thread:', err);
+      }
+    };
+    fetchThread();
+  }, [productId, token]);
+
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
     if (value > 0) {
@@ -143,6 +161,24 @@ function ProductDetailPage() {
     }
     addToCart();
     navigate('/checkout');
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatText.trim() || !token) return;
+    setChatLoading(true);
+    try {
+      const response = await axios.post(
+        apiUrl(`/api/messages/thread/${productId}`),
+        { text: chatText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setThread(response.data.thread);
+      setChatText('');
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   if (loading) {
@@ -354,6 +390,58 @@ function ProductDetailPage() {
             </div>
           )}
         </div>
+        {token && (
+          <div className="mt-10 bg-white border border-slate-200 rounded-2xl p-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Chat with Seller</h2>
+            {isSeller ? (
+              <div className="text-slate-600">
+                Sellers can reply from the{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/seller/chats')}
+                  className="text-cyan-700 font-semibold"
+                >
+                  Chats
+                </button>{' '}
+                page.
+              </div>
+            ) : (
+              <>
+                <div className="max-h-60 overflow-y-auto border border-slate-200 rounded-xl p-4 space-y-3 mb-4">
+                  {thread?.messages?.length ? (
+                    thread.messages.map((msg, idx) => (
+                      <div key={idx} className="text-sm text-slate-700">
+                        <span className="font-semibold">
+                          {msg.sender_id === localStorage.getItem('userId') ? 'You' : 'Seller'}:
+                        </span>{' '}
+                        {msg.text}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-slate-500">No messages yet. Start a conversation.</div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={chatText}
+                    onChange={(e) => setChatText(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md"
+                    placeholder="Ask about availability, sizing, delivery..."
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendMessage}
+                    disabled={chatLoading}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-md"
+                  >
+                    {chatLoading ? 'Sending...' : 'Send'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
