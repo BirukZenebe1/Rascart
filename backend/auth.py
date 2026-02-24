@@ -51,14 +51,42 @@ def _generate_code():
     return str(random.randint(100000, 999999))
 
 def _send_verification_email(email, code):
-    subject = "merkatoAI Email Verification"
-    body = f"Your verification code is: {code}\nThis code expires in 10 minutes."
-    return send_email(email, subject, body)
+    subject = "Your merkatoAI verification code"
+    body_text = (
+        "Use the verification code below to activate your merkatoAI account.\n\n"
+        f"Verification code: {code}\n"
+        "Expires in: 10 minutes\n\n"
+        "If you did not request this, you can ignore this email."
+    )
+    body_html = (
+        "<html><body style='font-family:Arial,sans-serif;color:#0f172a;'>"
+        "<h2 style='margin-bottom:8px;'>Verify your merkatoAI account</h2>"
+        "<p>Use the code below to complete your sign up:</p>"
+        f"<p style='font-size:28px;font-weight:700;letter-spacing:4px;margin:14px 0;'>{code}</p>"
+        "<p style='margin:0 0 12px;'>This code expires in <b>10 minutes</b>.</p>"
+        "<p style='font-size:13px;color:#475569;'>If you did not request this, you can ignore this message.</p>"
+        "</body></html>"
+    )
+    return send_email(email, subject, body_text, body_html=body_html)
 
 def _send_reset_email(email, code):
-    subject = "merkatoAI Password Reset"
-    body = f"Your password reset code is: {code}\nThis code expires in 10 minutes."
-    return send_email(email, subject, body)
+    subject = "Your merkatoAI password reset code"
+    body_text = (
+        "You requested to reset your merkatoAI password.\n\n"
+        f"Reset code: {code}\n"
+        "Expires in: 10 minutes\n\n"
+        "If you did not request a password reset, ignore this email and keep your account secure."
+    )
+    body_html = (
+        "<html><body style='font-family:Arial,sans-serif;color:#0f172a;'>"
+        "<h2 style='margin-bottom:8px;'>Reset your merkatoAI password</h2>"
+        "<p>Use this one-time code to continue:</p>"
+        f"<p style='font-size:28px;font-weight:700;letter-spacing:4px;margin:14px 0;'>{code}</p>"
+        "<p style='margin:0 0 12px;'>This code expires in <b>10 minutes</b>.</p>"
+        "<p style='font-size:13px;color:#475569;'>If you did not request this change, ignore this email.</p>"
+        "</body></html>"
+    )
+    return send_email(email, subject, body_text, body_html=body_html)
 
 # User Registration
 @auth_bp.route('/register', methods=['POST'])
