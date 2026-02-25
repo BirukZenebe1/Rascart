@@ -306,17 +306,8 @@ def update_profile():
                 return jsonify({"error": "Username already taken"}), 409
             updates['username'] = username
 
-        if 'email' in data:
-            email = (data.get('email') or '').strip().lower()
-            if not email:
-                return jsonify({"error": "Email cannot be empty"}), 400
-            existing_email = auth_bp.mongo.db.users.find_one({
-                'email': email,
-                '_id': {'$ne': user_id}
-            })
-            if existing_email:
-                return jsonify({"error": "Email already registered"}), 409
-            updates['email'] = email
+        if 'email' in data and (data.get('email') or '').strip().lower() != (user.get('email') or '').strip().lower():
+            return jsonify({"error": "Email address cannot be changed once set"}), 400
 
         if 'preferred_payment_method' in data:
             payment_method = (data.get('preferred_payment_method') or '').strip()

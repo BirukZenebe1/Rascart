@@ -63,7 +63,6 @@ function ProfilePage() {
       const token = localStorage.getItem('token');
       const payload = {
         username: user.username,
-        email: user.email,
         preferred_payment_method: user.preferred_payment_method || ''
       };
 
@@ -182,10 +181,10 @@ function ProfilePage() {
                 <input
                   type="email"
                   value={user.email}
-                  onChange={(e) => handleFieldChange('email', e.target.value)}
-                  disabled={!editing}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md disabled:bg-slate-100"
+                  disabled
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-100"
                 />
+                <p className="mt-1 text-xs text-slate-500">Email is locked after registration.</p>
               </div>
 
               {user.user_type !== 'seller' && (

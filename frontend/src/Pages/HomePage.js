@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const looks = [
@@ -9,11 +9,36 @@ const looks = [
 ];
 
 const orbitItems = ['👗', '👔', '👜', '👠', '🧥', '🧢', '💎', '🛍️'];
+const brandRows = [
+  {
+    title: 'Shoes',
+    items: ['Nike', 'Adidas', 'Puma', 'New Balance', 'Converse', 'Vans']
+  },
+  {
+    title: 'Clothing',
+    items: ['Zara', 'H&M', 'Uniqlo', 'Levi’s', 'COS', 'Mango']
+  },
+  {
+    title: 'Sportswear',
+    items: ['Under Armour', 'Lululemon', 'Reebok', 'The North Face', 'Columbia', 'ASICS']
+  },
+  {
+    title: 'High-End',
+    items: ['Gucci', 'Prada', 'Balenciaga', 'Louis Vuitton', 'Dior', 'Burberry']
+  }
+];
 
 function HomePage() {
   const [lookIndex, setLookIndex] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const currentLook = looks[lookIndex];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLookIndex((prev) => (prev + 1) % looks.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
 
   const floatingOrbits = useMemo(
     () =>
@@ -92,24 +117,33 @@ function HomePage() {
                 <div className="home-vibe">{currentLook.vibe}</div>
               </div>
 
-              <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="mt-5 flex items-center gap-2">
                 {looks.map((look, index) => (
-                  <button
+                  <span
                     key={look.vibe}
-                    type="button"
-                    onClick={() => setLookIndex(index)}
-                    className={`rounded-xl border px-4 py-3 text-left transition ${
-                      lookIndex === index
-                        ? 'border-cyan-500 bg-cyan-50 shadow'
-                        : 'border-slate-200 bg-white hover:border-cyan-300'
+                    className={`h-2.5 rounded-full transition-all duration-500 ${
+                      lookIndex === index ? 'w-8 bg-cyan-600' : 'w-2.5 bg-slate-300'
                     }`}
-                  >
-                    <div className="text-xl">{look.animal} {look.outfit}</div>
-                    <div className="text-sm text-slate-600">{look.vibe}</div>
-                  </button>
+                  />
                 ))}
+                <span className="ml-2 text-sm text-slate-500">Auto styling in motion</span>
               </div>
             </div>
+          </div>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {brandRows.map((group) => (
+              <div key={group.title} className="rounded-2xl border border-slate-200 bg-white/85 backdrop-blur-sm p-4 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.2em] text-cyan-700 font-bold mb-2">{group.title}</div>
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((brand) => (
+                    <span key={brand} className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm font-semibold">
+                      {brand}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
