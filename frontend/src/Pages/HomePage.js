@@ -13,27 +13,27 @@ const brandRows = [
   {
     speedClass: 'home-brand-track-forward',
     items: [
-      { name: 'Nike', logo: 'https://cdn.simpleicons.org/nike/0f172a' },
-      { name: 'Adidas', logo: 'https://cdn.simpleicons.org/adidas/0f172a' },
-      { name: 'Puma', logo: 'https://cdn.simpleicons.org/puma/0f172a' },
-      { name: 'New Balance', logo: 'https://cdn.simpleicons.org/newbalance/0f172a' },
-      { name: 'Reebok', logo: 'https://cdn.simpleicons.org/reebok/0f172a' },
-      { name: 'Under Armour', logo: 'https://cdn.simpleicons.org/underarmour/0f172a' },
-      { name: 'Asics', logo: 'https://cdn.simpleicons.org/asics/0f172a' },
-      { name: 'Converse', logo: 'https://cdn.simpleicons.org/converse/0f172a' }
+      { name: 'Nike', logo: 'https://logo.clearbit.com/nike.com' },
+      { name: 'Adidas', logo: 'https://logo.clearbit.com/adidas.com' },
+      { name: 'Puma', logo: 'https://logo.clearbit.com/puma.com' },
+      { name: 'New Balance', logo: 'https://logo.clearbit.com/newbalance.com' },
+      { name: 'Reebok', logo: 'https://logo.clearbit.com/reebok.com' },
+      { name: 'Under Armour', logo: 'https://logo.clearbit.com/underarmour.com' },
+      { name: 'Asics', logo: 'https://logo.clearbit.com/asics.com' },
+      { name: 'Converse', logo: 'https://logo.clearbit.com/converse.com' }
     ]
   },
   {
     speedClass: 'home-brand-track-fast',
     items: [
-      { name: 'Gucci', logo: 'https://cdn.simpleicons.org/gucci/0f172a' },
-      { name: 'Prada', logo: 'https://cdn.simpleicons.org/prada/0f172a' },
-      { name: 'Dior', logo: 'https://cdn.simpleicons.org/dior/0f172a' },
-      { name: 'Zara', logo: 'https://cdn.simpleicons.org/zara/0f172a' },
-      { name: 'Levis', logo: 'https://cdn.simpleicons.org/levis/0f172a' },
-      { name: 'Burberry', logo: 'https://cdn.simpleicons.org/burberry/0f172a' },
-      { name: 'The North Face', logo: 'https://cdn.simpleicons.org/thenorthface/0f172a' },
-      { name: 'Columbia', logo: 'https://cdn.simpleicons.org/columbia/0f172a' }
+      { name: 'Gucci', logo: 'https://logo.clearbit.com/gucci.com' },
+      { name: 'Prada', logo: 'https://logo.clearbit.com/prada.com' },
+      { name: 'Dior', logo: 'https://logo.clearbit.com/dior.com' },
+      { name: 'Zara', logo: 'https://logo.clearbit.com/zara.com' },
+      { name: 'Levis', logo: 'https://logo.clearbit.com/levi.com' },
+      { name: 'Burberry', logo: 'https://logo.clearbit.com/burberry.com' },
+      { name: 'The North Face', logo: 'https://logo.clearbit.com/thenorthface.com' },
+      { name: 'Columbia', logo: 'https://logo.clearbit.com/columbia.com' }
     ]
   }
 ];
@@ -154,7 +154,18 @@ function HomePage() {
                   <div className={`home-brand-track ${group.speedClass}`}>
                     {[...group.items, ...group.items].map((brand, index) => (
                       <div key={`${rowIndex}-${brand.name}-${index}`} className="home-brand-logo-card" title={brand.name} aria-label={brand.name}>
-                        <img src={brand.logo} alt={brand.name} className="home-brand-logo-img" loading="lazy" />
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="home-brand-logo-img"
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.style.display = 'none';
+                            const fallback = event.currentTarget.nextElementSibling;
+                            if (fallback) fallback.style.display = 'inline-flex';
+                          }}
+                        />
+                        <span className="home-brand-fallback">{brand.name.slice(0, 2).toUpperCase()}</span>
                       </div>
                     ))}
                   </div>
