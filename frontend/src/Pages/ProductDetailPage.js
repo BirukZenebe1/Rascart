@@ -18,12 +18,12 @@ function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [similarLoading, setSimilarLoading] = useState(false);
   const [thread, setThread] = useState(null);
   const [chatText, setChatText] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
+  const isInCart = !!cart?.cartItems?.some((item) => (item._id || item.id) === (product?._id || product?.id));
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -152,9 +152,8 @@ function ProductDetailPage() {
   };
 
   const handleAddToCart = () => {
+    if (isInCart) return;
     addToCart();
-    setAddedToCart(true);
-    window.setTimeout(() => setAddedToCart(false), 1700);
   };
 
   const handleProceedToCheckout = () => {
@@ -353,13 +352,14 @@ function ProductDetailPage() {
               </button>
               <button
                 onClick={handleAddToCart}
+                disabled={isInCart}
                 className={`mt-3 w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  addedToCart
-                    ? 'bg-emerald-600 text-white shadow-md scale-[1.01]'
+                  isInCart
+                    ? 'bg-emerald-600 text-white shadow-md cursor-not-allowed opacity-95'
                     : 'bg-slate-900 text-white hover:bg-slate-800'
                 }`}
               >
-                {addedToCart ? `Added to Cart (${quantity})` : 'Add to Cart'}
+                {isInCart ? 'Added to Cart' : 'Add to Cart'}
               </button>
             </>
           )}

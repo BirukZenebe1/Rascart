@@ -1,37 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 function CartPage() {
-  const [cartItems, setCartItems] = useState([]);
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // For now, cart items are stored in localStorage
-    // Later, you can fetch from backend
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
-    }
-  }, []);
-
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-
-    const updatedCart = cartItems.map(item =>
-      item._id === productId ? { ...item, quantity: newQuantity } : item
-    );
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  };
-
-  const removeFromCart = (productId) => {
-    const updatedCart = cartItems.filter(item => item._id !== productId);
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  };
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);

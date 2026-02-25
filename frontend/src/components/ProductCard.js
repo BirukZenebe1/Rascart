@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
   const cart = useCart();
-  const [addedToCart, setAddedToCart] = useState(false);
   const isSeller = localStorage.getItem('userType') === 'seller';
   const productId = product._id || product.id;
   const productLink = productId ? `/product/${productId}` : '/shop';
+  const isInCart = !!cart?.cartItems?.some((item) => (item._id || item.id) === productId);
 
   const handleAddToCart = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (isSeller || !productId) return;
+    if (isSeller || !productId || isInCart) return;
 
     if (cart?.addToCart) {
       cart.addToCart(product, 1);
@@ -29,9 +29,6 @@ const ProductCard = ({ product }) => {
       }
       localStorage.setItem('cart', JSON.stringify(savedCart));
     }
-
-    setAddedToCart(true);
-    window.setTimeout(() => setAddedToCart(false), 1600);
   };
 
   return (
@@ -51,13 +48,14 @@ const ProductCard = ({ product }) => {
         {!isSeller && (
           <button
             onClick={handleAddToCart}
+            disabled={isInCart}
             className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-              addedToCart
-                ? 'bg-emerald-600 text-white shadow-md scale-[1.01]'
+              isInCart
+                ? 'bg-emerald-600 text-white shadow-md cursor-not-allowed opacity-95'
                 : 'bg-slate-900 text-white hover:bg-slate-800'
             }`}
           >
-            {addedToCart ? 'Added to Cart' : 'Add to Cart'}
+            {isInCart ? 'Added to Cart' : 'Add to Cart'}
           </button>
         )}
       </div>
