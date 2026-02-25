@@ -352,11 +352,10 @@ function ProductDetailPage() {
               </button>
               <button
                 onClick={handleAddToCart}
-                disabled={isInCart}
                 className={`mt-3 w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
                   isInCart
-                    ? 'bg-emerald-600 text-white shadow-md cursor-not-allowed opacity-95'
-                    : 'bg-slate-900 text-white hover:bg-slate-800'
+                    ? 'btn-cart btn-cart-added'
+                    : 'btn-cart'
                 }`}
               >
                 {isInCart ? 'Added to Cart' : 'Add to Cart'}

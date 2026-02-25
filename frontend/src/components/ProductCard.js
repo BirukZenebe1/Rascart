@@ -48,11 +48,10 @@ const ProductCard = ({ product }) => {
         {!isSeller && (
           <button
             onClick={handleAddToCart}
-            disabled={isInCart}
             className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
               isInCart
-                ? 'bg-emerald-600 text-white shadow-md cursor-not-allowed opacity-95'
-                : 'bg-slate-900 text-white hover:bg-slate-800'
+                ? 'btn-cart btn-cart-added'
+                : 'btn-cart'
             }`}
           >
             {isInCart ? 'Added to Cart' : 'Add to Cart'}

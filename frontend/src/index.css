@@ -64,6 +64,21 @@ a[class*="bg-emerald-600"]:hover {
   background-color: #dc2626 !important;
 }
 
+.btn-cart {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+.btn-cart:hover {
+  background-color: #020617 !important;
+}
+
+.btn-cart-added {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+}
+
 .hero-orbit {
   position: absolute;
   inset: -35% -20% -35% -20%;
