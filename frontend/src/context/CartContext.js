@@ -3,6 +3,12 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 // Create context
 
 const CartContext = createContext();
+
+const getItemId = (item) => item?._id || item?.id;
+const normalizeMaxStock = (item) => {
+  const parsed = Number(item?.stock);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
  
 export const CartProvider = ({ children }) => {
 
@@ -29,22 +35,27 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product, quantity = 1) => {
 
     setCartItems(prevItems => {
+      const productId = getItemId(product);
+      if (!productId) return prevItems;
 
       // Check if item already exists in cart
 
-      const existingItemIndex = prevItems.findIndex(item => item._id === product._id);
+      const existingItemIndex = prevItems.findIndex(item => getItemId(item) === productId);
+      const maxStock = normalizeMaxStock(product);
 
       if (existingItemIndex !== -1) {
 
         // Update quantity of existing item
 
         const updatedItems = [...prevItems];
+        const nextQuantity = updatedItems[existingItemIndex].quantity + quantity;
+        const safeQuantity = maxStock ? Math.min(nextQuantity, maxStock) : nextQuantity;
 
         updatedItems[existingItemIndex] = {
 
           ...updatedItems[existingItemIndex],
 
-          quantity: updatedItems[existingItemIndex].quantity + quantity
+          quantity: safeQuantity
 
         };
 
@@ -53,8 +64,9 @@ export const CartProvider = ({ children }) => {
       } else {
 
         // Add new item to cart
+        const safeQuantity = maxStock ? Math.min(quantity, maxStock) : quantity;
 
-        return [...prevItems, { ...product, quantity }];
+        return [...prevItems, { ...product, quantity: safeQuantity }];
 
       }
 
@@ -66,7 +78,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId) => {
 
-    setCartItems(prevItems => prevItems.filter(item => item._id !== productId));
+    setCartItems(prevItems => prevItems.filter(item => getItemId(item) !== productId));
 
   };
 
@@ -82,14 +94,13 @@ export const CartProvider = ({ children }) => {
 
     }
 
-    setCartItems(prevItems => 
-
-      prevItems.map(item => 
-
-        item._id === productId ? { ...item, quantity } : item
-
-      )
-
+    setCartItems(prevItems =>
+      prevItems.map(item => {
+        if (getItemId(item) !== productId) return item;
+        const maxStock = normalizeMaxStock(item);
+        const safeQuantity = maxStock ? Math.min(quantity, maxStock) : quantity;
+        return { ...item, quantity: safeQuantity };
+      })
     );
 
   };

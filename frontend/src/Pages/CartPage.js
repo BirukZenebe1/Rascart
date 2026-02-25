@@ -50,7 +50,7 @@ function CartPage() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
             {cartItems.map((item) => (
-              <div key={item._id} className="flex items-center p-6 border-b border-slate-200 last:border-b-0">
+              <div key={item._id || item.id} className="flex items-center p-6 border-b border-slate-200 last:border-b-0">
                 {/* Product Image */}
                 <div className="w-24 h-24 flex-shrink-0">
                   {item.image_url ? (
@@ -76,15 +76,21 @@ function CartPage() {
                 {/* Quantity Controls */}
                 <div className="flex items-center space-x-3">
                   <button
-                    onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                    onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}
                     className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center hover:bg-slate-100"
                   >
                     -
                   </button>
                   <span className="w-8 text-center font-semibold">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                    className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center hover:bg-slate-100"
+                    onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}
+                    disabled={Number(item.stock) > 0 && item.quantity >= Number(item.stock)}
+                    className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${
+                      Number(item.stock) > 0 && item.quantity >= Number(item.stock)
+                        ? 'border-slate-200 text-slate-300 cursor-not-allowed'
+                        : 'border-slate-300 hover:bg-slate-100'
+                    }`}
+                    title={Number(item.stock) > 0 && item.quantity >= Number(item.stock) ? `Max available: ${item.stock}` : ''}
                   >
                     +
                   </button>
@@ -92,7 +98,7 @@ function CartPage() {
 
                 {/* Remove Button */}
                 <button
-                  onClick={() => removeFromCart(item._id)}
+                  onClick={() => removeFromCart(item._id || item.id)}
                   className="ml-6 text-rose-500 hover:text-rose-700"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

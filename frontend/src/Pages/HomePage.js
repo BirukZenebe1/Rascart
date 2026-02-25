@@ -33,7 +33,7 @@ const brandRows = [
       { name: "Levi's", textOnly: true, wordmarkClass: 'brand-wordmark-levis' },
       { name: 'BURBERRY', textOnly: true, wordmarkClass: 'brand-wordmark-burberry' },
       { name: 'The North Face', logo: 'https://cdn.simpleicons.org/thenorthface/0f172a' },
-      { name: 'Gymshark', logo: 'https://logo.clearbit.com/gymshark.com' }
+      { name: 'Lululemon', logo: 'https://cdn.simpleicons.org/lululemon/0f172a' }
     ]
   }
 ];
