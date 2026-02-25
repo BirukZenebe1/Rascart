@@ -65,12 +65,12 @@ a[class*="bg-emerald-600"]:hover {
 }
 
 .btn-cart {
-  background-color: #0f172a !important;
+  background-color: var(--brand-ai) !important;
   color: #ffffff !important;
 }
 
 .btn-cart:hover {
-  background-color: #020617 !important;
+  background-color: var(--brand-ai-hover) !important;
 }
 
 .btn-cart-added {
