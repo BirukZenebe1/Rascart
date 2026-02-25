@@ -11,20 +11,19 @@ const looks = [
 const orbitItems = ['👗', '👔', '👜', '👠', '🧥', '🧢', '💎', '🛍️'];
 const brandRows = [
   {
-    title: 'Shoes',
-    items: ['Nike', 'Adidas', 'Puma', 'New Balance', 'Converse', 'Vans']
+    title: 'Street x Sport',
+    speedClass: 'home-brand-track-fast',
+    items: ['Nike', 'Balenciaga', 'Adidas', 'Prada', 'Puma', 'Moncler', 'ASICS', 'Gucci', 'New Balance', 'Dior']
   },
   {
-    title: 'Clothing',
-    items: ['Zara', 'H&M', 'Uniqlo', 'Levi’s', 'COS', 'Mango']
+    title: 'Luxury x Daily',
+    speedClass: 'home-brand-track-slow',
+    items: ['Zara', 'Louis Vuitton', 'Uniqlo', 'Burberry', 'Mango', 'Fendi', 'Levi’s', 'Versace', 'COS', 'Bottega Veneta']
   },
   {
-    title: 'Sportswear',
-    items: ['Under Armour', 'Lululemon', 'Reebok', 'The North Face', 'Columbia', 'ASICS']
-  },
-  {
-    title: 'High-End',
-    items: ['Gucci', 'Prada', 'Balenciaga', 'Louis Vuitton', 'Dior', 'Burberry']
+    title: 'Outdoor x High-End',
+    speedClass: 'home-brand-track-medium',
+    items: ['The North Face', 'Loro Piana', 'Columbia', 'Off-White', 'Reebok', 'Givenchy', 'Lululemon', 'Saint Laurent', 'Vans', 'Kenzo']
   }
 ];
 
@@ -131,19 +130,31 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {brandRows.map((group) => (
-              <div key={group.title} className="rounded-2xl border border-slate-200 bg-white/85 backdrop-blur-sm p-4 shadow-sm">
-                <div className="text-xs uppercase tracking-[0.2em] text-cyan-700 font-bold mb-2">{group.title}</div>
-                <div className="flex flex-wrap gap-2">
-                  {group.items.map((brand) => (
-                    <span key={brand} className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm font-semibold">
-                      {brand}
-                    </span>
-                  ))}
-                </div>
+          <div className="mt-12 rounded-3xl border border-slate-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm home-brand-showcase">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-cyan-700 font-bold mb-1">Brand Mix</p>
+                <p className="text-sm text-slate-600">A live rotation of sport, street, luxury, and outdoor labels.</p>
               </div>
-            ))}
+              <span className="inline-flex items-center rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1 text-xs font-semibold text-cyan-700">
+                Always in motion
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {brandRows.map((group) => (
+                <div key={group.title} className="home-brand-lane">
+                  <div className="home-brand-lane-label">{group.title}</div>
+                  <div className={`home-brand-track ${group.speedClass}`}>
+                    {[...group.items, ...group.items].map((brand, index) => (
+                      <span key={`${group.title}-${brand}-${index}`} className="home-brand-pill">
+                        {brand}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
