@@ -19,19 +19,19 @@ const brandRows = [
       { name: 'New Balance', logo: 'https://cdn.simpleicons.org/newbalance/0f172a' },
       { name: 'Reebok', logo: 'https://cdn.simpleicons.org/reebok/0f172a' },
       { name: 'Under Armour', logo: 'https://cdn.simpleicons.org/underarmour/0f172a' },
-      { name: 'Asics', textOnly: true },
-      { name: 'Converse', textOnly: true }
+      { name: 'ASICS', textOnly: true, wordmarkClass: 'brand-wordmark-asics' },
+      { name: 'CONVERSE', textOnly: true, wordmarkClass: 'brand-wordmark-converse' }
     ]
   },
   {
     speedClass: 'home-brand-track-fast',
     items: [
-      { name: 'Gucci', textOnly: true },
-      { name: 'Prada', textOnly: true },
+      { name: 'GUCCI', textOnly: true, wordmarkClass: 'brand-wordmark-gucci' },
+      { name: 'PRADA', textOnly: true, wordmarkClass: 'brand-wordmark-prada' },
       { name: 'Dior', logo: 'https://cdn.simpleicons.org/dior/0f172a' },
       { name: 'Zara', logo: 'https://cdn.simpleicons.org/zara/0f172a' },
-      { name: "Levi's", textOnly: true },
-      { name: 'Burberry', textOnly: true },
+      { name: "Levi's", textOnly: true, wordmarkClass: 'brand-wordmark-levis' },
+      { name: 'BURBERRY', textOnly: true, wordmarkClass: 'brand-wordmark-burberry' },
       { name: 'The North Face', logo: 'https://cdn.simpleicons.org/thenorthface/0f172a' },
       { name: 'Columbia', logo: 'https://cdn.simpleicons.org/columbia/0f172a' }
     ]
@@ -155,7 +155,7 @@ function HomePage() {
                     {[...group.items, ...group.items].map((brand, index) => (
                       <div key={`${rowIndex}-${brand.name}-${index}`} className="home-brand-logo-card" title={brand.name} aria-label={brand.name}>
                         {brand.textOnly ? (
-                          <span className="home-brand-text-only">{brand.name}</span>
+                          <span className={`home-brand-text-only ${brand.wordmarkClass || ''}`}>{brand.name}</span>
                         ) : (
                           <img src={brand.logo} alt={brand.name} className="home-brand-logo-img" loading="lazy" />
                         )}

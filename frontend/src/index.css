@@ -277,6 +277,50 @@ a[class*="bg-emerald-600"]:hover {
   font-weight: 800;
   letter-spacing: 0.02em;
   color: #0f172a;
+  white-space: nowrap;
+}
+
+.brand-wordmark-gucci {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+}
+
+.brand-wordmark-prada {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  font-weight: 500;
+}
+
+.brand-wordmark-burberry {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 1.06rem;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+}
+
+.brand-wordmark-asics {
+  font-family: "Arial Black", "Segoe UI", sans-serif;
+  font-size: 1.06rem;
+  letter-spacing: 0.1em;
+  transform: skewX(-10deg);
+  display: inline-block;
+}
+
+.brand-wordmark-converse {
+  font-family: "Arial Black", "Segoe UI", sans-serif;
+  font-size: 1.02rem;
+  letter-spacing: 0.14em;
+  font-weight: 900;
+}
+
+.brand-wordmark-levis {
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+  font-weight: 800;
 }
 
 @keyframes home-brand-scroll {
