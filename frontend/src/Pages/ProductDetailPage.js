@@ -18,6 +18,7 @@ function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [similarLoading, setSimilarLoading] = useState(false);
   const [thread, setThread] = useState(null);
@@ -152,7 +153,8 @@ function ProductDetailPage() {
 
   const handleAddToCart = () => {
     addToCart();
-    alert(`Added ${quantity} of ${product.name} to cart`);
+    setAddedToCart(true);
+    window.setTimeout(() => setAddedToCart(false), 1700);
   };
 
   const handleProceedToCheckout = () => {
@@ -351,9 +353,13 @@ function ProductDetailPage() {
               </button>
               <button
                 onClick={handleAddToCart}
-                className="mt-3 w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
+                className={`mt-3 w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                  addedToCart
+                    ? 'bg-emerald-600 text-white shadow-md scale-[1.01]'
+                    : 'bg-slate-900 text-white hover:bg-slate-800'
+                }`}
               >
-                Add to Cart
+                {addedToCart ? `Added to Cart (${quantity})` : 'Add to Cart'}
               </button>
             </>
           )}

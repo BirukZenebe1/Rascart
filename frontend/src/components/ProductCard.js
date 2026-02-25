@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
   const cart = useCart();
+  const [addedToCart, setAddedToCart] = useState(false);
   const isSeller = localStorage.getItem('userType') === 'seller';
   const productId = product._id || product.id;
   const productLink = productId ? `/product/${productId}` : '/shop';
@@ -28,6 +29,9 @@ const ProductCard = ({ product }) => {
       }
       localStorage.setItem('cart', JSON.stringify(savedCart));
     }
+
+    setAddedToCart(true);
+    window.setTimeout(() => setAddedToCart(false), 1600);
   };
 
   return (
@@ -47,9 +51,13 @@ const ProductCard = ({ product }) => {
         {!isSeller && (
           <button
             onClick={handleAddToCart}
-            className="w-full inline-flex items-center justify-center bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition-colors"
+            className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+              addedToCart
+                ? 'bg-emerald-600 text-white shadow-md scale-[1.01]'
+                : 'bg-slate-900 text-white hover:bg-slate-800'
+            }`}
           >
-            Add to Cart
+            {addedToCart ? 'Added to Cart' : 'Add to Cart'}
           </button>
         )}
       </div>
