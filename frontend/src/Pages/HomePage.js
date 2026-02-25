@@ -11,19 +11,30 @@ const looks = [
 const orbitItems = ['👗', '👔', '👜', '👠', '🧥', '🧢', '💎', '🛍️'];
 const brandRows = [
   {
-    title: 'Street x Sport',
+    speedClass: 'home-brand-track-forward',
+    items: [
+      { name: 'Nike', logo: 'https://cdn.simpleicons.org/nike/0f172a' },
+      { name: 'Adidas', logo: 'https://cdn.simpleicons.org/adidas/0f172a' },
+      { name: 'Puma', logo: 'https://cdn.simpleicons.org/puma/0f172a' },
+      { name: 'New Balance', logo: 'https://cdn.simpleicons.org/newbalance/0f172a' },
+      { name: 'Reebok', logo: 'https://cdn.simpleicons.org/reebok/0f172a' },
+      { name: 'Under Armour', logo: 'https://cdn.simpleicons.org/underarmour/0f172a' },
+      { name: 'Asics', logo: 'https://cdn.simpleicons.org/asics/0f172a' },
+      { name: 'Converse', logo: 'https://cdn.simpleicons.org/converse/0f172a' }
+    ]
+  },
+  {
     speedClass: 'home-brand-track-fast',
-    items: ['Nike', 'Balenciaga', 'Adidas', 'Prada', 'Puma', 'Moncler', 'ASICS', 'Gucci', 'New Balance', 'Dior']
-  },
-  {
-    title: 'Luxury x Daily',
-    speedClass: 'home-brand-track-slow',
-    items: ['Zara', 'Louis Vuitton', 'Uniqlo', 'Burberry', 'Mango', 'Fendi', 'Levi’s', 'Versace', 'COS', 'Bottega Veneta']
-  },
-  {
-    title: 'Outdoor x High-End',
-    speedClass: 'home-brand-track-medium',
-    items: ['The North Face', 'Loro Piana', 'Columbia', 'Off-White', 'Reebok', 'Givenchy', 'Lululemon', 'Saint Laurent', 'Vans', 'Kenzo']
+    items: [
+      { name: 'Gucci', logo: 'https://cdn.simpleicons.org/gucci/0f172a' },
+      { name: 'Prada', logo: 'https://cdn.simpleicons.org/prada/0f172a' },
+      { name: 'Dior', logo: 'https://cdn.simpleicons.org/dior/0f172a' },
+      { name: 'Zara', logo: 'https://cdn.simpleicons.org/zara/0f172a' },
+      { name: 'Levis', logo: 'https://cdn.simpleicons.org/levis/0f172a' },
+      { name: 'Burberry', logo: 'https://cdn.simpleicons.org/burberry/0f172a' },
+      { name: 'The North Face', logo: 'https://cdn.simpleicons.org/thenorthface/0f172a' },
+      { name: 'Columbia', logo: 'https://cdn.simpleicons.org/columbia/0f172a' }
+    ]
   }
 ];
 
@@ -131,25 +142,20 @@ function HomePage() {
           </div>
 
           <div className="mt-12 rounded-3xl border border-slate-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm home-brand-showcase">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-cyan-700 font-bold mb-1">Brand Mix</p>
-                <p className="text-sm text-slate-600">A live rotation of sport, street, luxury, and outdoor labels.</p>
-              </div>
+            <div className="flex items-center justify-end gap-3 mb-4">
               <span className="inline-flex items-center rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1 text-xs font-semibold text-cyan-700">
                 Always in motion
               </span>
             </div>
 
             <div className="space-y-3">
-              {brandRows.map((group) => (
-                <div key={group.title} className="home-brand-lane">
-                  <div className="home-brand-lane-label">{group.title}</div>
+              {brandRows.map((group, rowIndex) => (
+                <div key={rowIndex} className="home-brand-lane">
                   <div className={`home-brand-track ${group.speedClass}`}>
                     {[...group.items, ...group.items].map((brand, index) => (
-                      <span key={`${group.title}-${brand}-${index}`} className="home-brand-pill">
-                        {brand}
-                      </span>
+                      <div key={`${rowIndex}-${brand.name}-${index}`} className="home-brand-logo-card" title={brand.name} aria-label={brand.name}>
+                        <img src={brand.logo} alt={brand.name} className="home-brand-logo-img" loading="lazy" />
+                      </div>
                     ))}
                   </div>
                 </div>
