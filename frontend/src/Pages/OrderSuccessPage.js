@@ -1,12 +1,30 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function OrderSuccessPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const orderId = location.state?.orderId;
   const itemCount = location.state?.itemCount;
   const total = location.state?.total;
   const emailNotice = location.state?.emailNotice;
+  const soldOutTypes = location.state?.soldOutTypes || [];
+  const [secondsLeft, setSecondsLeft] = useState(5);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setSecondsLeft((prev) => (prev > 1 ? prev - 1 : 1));
+    }, 1000);
+
+    const timeoutId = window.setTimeout(() => {
+      navigate('/shop');
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
@@ -28,14 +46,21 @@ function OrderSuccessPage() {
               {total ? <div>Total charged: ${total}</div> : null}
             </div>
           )}
+          {soldOutTypes.length > 0 && (
+            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
+              <div className="font-semibold">Sold out after this checkout</div>
+              <div className="mt-1">{soldOutTypes.join(', ')}</div>
+            </div>
+          )}
           <p className="text-slate-500 mt-3">{emailNotice || 'A confirmation email has been sent to your inbox.'}</p>
+          <p className="text-sm text-slate-500 mt-2">Redirecting to shop in {secondsLeft}s...</p>
           
           <div className="mt-8 flex justify-center space-x-4">
             <Link 
-              to="/"
+              to="/shop"
               className="px-5 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
             >
-              Go to Home
+              Go to Shop Now
             </Link>
             <Link 
               to="/profile"

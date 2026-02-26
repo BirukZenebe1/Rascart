@@ -26,6 +26,7 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import StyleResultsPage from './Pages/StyleResultsPage';
 import StyleQuestionnaire from './components/StyleQuestionnaire';
+import OrderSuccessPage from './Pages/OrderSuccessPage';
 
 function App() {
   return (
@@ -70,6 +71,11 @@ function App() {
             <Route path="/checkout" element={
               <PrivateRoute>
                 <CheckoutPage />
+              </PrivateRoute>
+            } />
+            <Route path="/order-success" element={
+              <PrivateRoute>
+                <OrderSuccessPage />
               </PrivateRoute>
             } />
             <Route path="/profile" element={<ProfilePage />} />

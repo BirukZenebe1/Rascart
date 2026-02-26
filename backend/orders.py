@@ -51,6 +51,7 @@ def create_order_route():
 
         seller_item_groups = defaultdict(list)
         seller_ids = set()
+        sold_out_types = set()
 
         # decrement stock and auto-unlist when sold out
         for item in items:
@@ -64,6 +65,17 @@ def create_order_route():
             product_doc = orders_bp.mongo.db.products.find_one(product_filter)
             if not product_doc:
                 continue
+
+            seller_oid = _safe_object_id(product_doc.get('seller_id'))
+            product_type = (product_doc.get('product_type') or '').strip()
+            before_same_type = 0
+            if seller_oid and product_type:
+                before_same_type = orders_bp.mongo.db.products.count_documents({
+                    'seller_id': seller_oid,
+                    'product_type': product_type,
+                    'is_active': True,
+                    'stock': {'$gt': 0}
+                })
 
             current_stock = int(product_doc.get('stock', 0))
             new_stock = max(0, current_stock - qty)
@@ -82,9 +94,17 @@ def create_order_route():
                 }
             )
 
-            seller_oid = _safe_object_id(product_doc.get('seller_id'))
             if seller_oid:
                 seller_ids.add(seller_oid)
+                if product_type:
+                    remaining_same_type = orders_bp.mongo.db.products.count_documents({
+                        'seller_id': seller_oid,
+                        'product_type': product_type,
+                        'is_active': True,
+                        'stock': {'$gt': 0}
+                    })
+                    if before_same_type > 2 and remaining_same_type == 0:
+                        sold_out_types.add(product_type)
                 seller_item_groups[str(seller_oid)].append({
                     "name": item.get('name') or product_doc.get('name') or 'Item',
                     "quantity": qty,
@@ -172,7 +192,8 @@ def create_order_route():
             "order_id": str(result.inserted_id),
             "buyer_email_sent": email_notice is None and bool(recipient_email),
             "seller_emails_sent": seller_email_sent_count,
-            "seller_emails_failed": len(seller_email_failures)
+            "seller_emails_failed": len(seller_email_failures),
+            "sold_out_types": sorted(list(sold_out_types))
         }
         if email_notice:
             response_payload["email_notice"] = "Order placed but confirmation email could not be sent."

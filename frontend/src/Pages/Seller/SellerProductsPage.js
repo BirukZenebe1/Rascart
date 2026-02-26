@@ -42,6 +42,18 @@ function SellerProductsPage() {
     return list;
   }, [products, metric]);
 
+  const availableByType = React.useMemo(() => {
+    return products.reduce((acc, product) => {
+      const key = (product.product_type || '').trim().toLowerCase();
+      if (!key) return acc;
+      const inStockActive = Boolean(product.is_active) && Number(product.stock || 0) > 0;
+      if (inStockActive) {
+        acc[key] = (acc[key] || 0) + 1;
+      }
+      return acc;
+    }, {});
+  }, [products]);
+
   const monitorLabel = {
     total: 'Monitoring total products',
     active: 'Monitoring active products',
@@ -143,6 +155,9 @@ function SellerProductsPage() {
                   Type
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Same Type In Store
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -198,6 +213,13 @@ function SellerProductsPage() {
                     <div className="text-sm text-gray-900">{product.product_type || '-'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {product.product_type
+                        ? availableByType[(product.product_type || '').trim().toLowerCase()] || 0
+                        : '-'}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{product.preferred_contact || '-'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -210,12 +232,14 @@ function SellerProductsPage() {
                     <button
                       onClick={() => toggleActive(product._id, product.is_active)}
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        product.is_active
+                        Number(product.stock || 0) <= 0
+                          ? 'bg-rose-100 text-rose-800'
+                          : product.is_active
                           ? 'bg-green-100 text-green-800'
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {product.is_active ? 'Active' : 'Inactive'}
+                      {Number(product.stock || 0) <= 0 ? 'Sold Out' : product.is_active ? 'Active' : 'Inactive'}
                     </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

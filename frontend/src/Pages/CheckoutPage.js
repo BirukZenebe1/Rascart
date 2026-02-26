@@ -117,7 +117,8 @@ function CheckoutPage() {
           orderId: response.data.order_id,
           itemCount: cartItems.reduce((sum, item) => sum + Number(item.quantity || 1), 0),
           total: total.toFixed(2),
-          emailNotice: response.data.email_notice || ''
+          emailNotice: response.data.email_notice || '',
+          soldOutTypes: response.data.sold_out_types || []
         }
       });
     } catch (error) {
