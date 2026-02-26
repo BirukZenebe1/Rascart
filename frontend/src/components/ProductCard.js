@@ -17,6 +17,10 @@ const ProductCard = ({ product }) => {
   const liked = Boolean(likeState.liked);
   const likeCount = Number(likeState.count || 0);
 
+  useEffect(() => {
+    likes?.seedLikeState(productId, Number(product.likes_count || 0));
+  }, [likes, productId, product.likes_count]);
+
   const handleAddToCart = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -126,6 +130,3 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
-  useEffect(() => {
-    likes?.seedLikeState(productId, Number(product.likes_count || 0));
-  }, [likes, productId, product.likes_count]);
