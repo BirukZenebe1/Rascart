@@ -65,8 +65,23 @@ export const LikesProvider = ({ children }) => {
 
   const toggleLike = (productId, fallbackCount = 0) => {
     if (!productId) return Promise.resolve();
+
+    let optimisticState = null;
+    setLikeMap((prev) => {
+      const current = prev[productId] || { liked: false, count: Number(fallbackCount) || 0 };
+      const nextLiked = !current.liked;
+      const nextCount = Math.max(0, Number(current.count || 0) + (nextLiked ? 1 : -1));
+      optimisticState = { liked: nextLiked, count: nextCount };
+      const nextMap = {
+        ...prev,
+        [productId]: optimisticState
+      };
+      broadcast(nextMap);
+      return nextMap;
+    });
+
     const token = localStorage.getItem('token');
-    if (!token) return Promise.resolve();
+    if (!token) return Promise.resolve(optimisticState);
 
     return axios
       .post(
@@ -75,18 +90,18 @@ export const LikesProvider = ({ children }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
-        const nextLiked = Boolean(response.data?.liked);
-        const nextCount = Math.max(0, Number(response.data?.likes_count || fallbackCount || 0));
+        const serverLiked = Boolean(response.data?.liked);
+        const serverCount = Math.max(0, Number(response.data?.likes_count || fallbackCount || 0));
         setLikeMap((prev) => {
           const nextMap = {
             ...prev,
-            [productId]: { liked: nextLiked, count: nextCount }
+            [productId]: { liked: serverLiked, count: serverCount }
           };
           broadcast(nextMap);
           return nextMap;
         });
       })
-      .catch(() => {});
+      .catch(() => optimisticState);
   };
 
   const getLikeState = (productId, fallbackCount = 0) => {
