@@ -1,24 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useLikes } from '../context/LikesContext';
 
 const ProductCard = ({ product }) => {
   const cart = useCart();
+  const likes = useLikes();
   const isSeller = localStorage.getItem('userType') === 'seller';
   const productId = product._id || product.id;
   const productLink = productId ? `/product/${productId}` : '/shop';
   const isInCart = !!cart?.cartItems?.some((item) => (item._id || item.id) === productId);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(Number(product.likes_count || 0));
-
-  useEffect(() => {
-    if (!productId) return;
-    const saved = JSON.parse(localStorage.getItem('productLikes') || '{}');
-    if (saved[productId]) {
-      setLiked(Boolean(saved[productId].liked));
-      setLikeCount(Number(saved[productId].count || 0));
-    }
-  }, [productId]);
+  const likeState = likes?.getLikeState(productId, Number(product.likes_count || 0)) || {
+    liked: false,
+    count: Number(product.likes_count || 0)
+  };
+  const liked = Boolean(likeState.liked);
+  const likeCount = Number(likeState.count || 0);
 
   const handleAddToCart = (event) => {
     event.preventDefault();
@@ -46,15 +43,7 @@ const ProductCard = ({ product }) => {
     event.preventDefault();
     event.stopPropagation();
     if (!productId) return;
-
-    const nextLiked = !liked;
-    const nextCount = Math.max(0, likeCount + (nextLiked ? 1 : -1));
-    setLiked(nextLiked);
-    setLikeCount(nextCount);
-
-    const saved = JSON.parse(localStorage.getItem('productLikes') || '{}');
-    saved[productId] = { liked: nextLiked, count: nextCount };
-    localStorage.setItem('productLikes', JSON.stringify(saved));
+    likes?.toggleLike(productId, Number(product.likes_count || 0));
   };
 
   const handleShare = async (event) => {

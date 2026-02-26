@@ -24,6 +24,7 @@ import SellerChatsPage from './Pages/Seller/SellerChatsPage';
 import AdminPromoPage from './Pages/AdminPromoPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import { LikesProvider } from './context/LikesContext';
 import StyleResultsPage from './Pages/StyleResultsPage';
 import StyleQuestionnaire from './components/StyleQuestionnaire';
 import OrderSuccessPage from './Pages/OrderSuccessPage';
@@ -32,11 +33,12 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <CartProvider>
-          <div className="App min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
+        <LikesProvider>
+          <CartProvider>
+            <div className="App min-h-screen flex flex-col">
+              <Navbar />
+              <main className="flex-1">
+                <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
             <Route path="/shop" element={
@@ -121,11 +123,12 @@ function App() {
                 <AdminPromoPage />
               </PrivateRoute>
             } />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </CartProvider>
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </CartProvider>
+        </LikesProvider>
       </AuthProvider>
     </Router>
   );
