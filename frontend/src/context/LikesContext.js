@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import axios from 'axios';
+import { apiUrl } from '../config';
 
 const LikesContext = createContext();
 const STORAGE_KEY = 'productLikes';
@@ -62,18 +64,29 @@ export const LikesProvider = ({ children }) => {
   };
 
   const toggleLike = (productId, fallbackCount = 0) => {
-    if (!productId) return;
-    setLikeMap((prev) => {
-      const current = prev[productId] || { liked: false, count: Number(fallbackCount) || 0 };
-      const nextLiked = !current.liked;
-      const nextCount = Math.max(0, Number(current.count || 0) + (nextLiked ? 1 : -1));
-      const nextMap = {
-        ...prev,
-        [productId]: { liked: nextLiked, count: nextCount }
-      };
-      broadcast(nextMap);
-      return nextMap;
-    });
+    if (!productId) return Promise.resolve();
+    const token = localStorage.getItem('token');
+    if (!token) return Promise.resolve();
+
+    return axios
+      .post(
+        apiUrl(`/api/products/${productId}/like`),
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((response) => {
+        const nextLiked = Boolean(response.data?.liked);
+        const nextCount = Math.max(0, Number(response.data?.likes_count || fallbackCount || 0));
+        setLikeMap((prev) => {
+          const nextMap = {
+            ...prev,
+            [productId]: { liked: nextLiked, count: nextCount }
+          };
+          broadcast(nextMap);
+          return nextMap;
+        });
+      })
+      .catch(() => {});
   };
 
   const getLikeState = (productId, fallbackCount = 0) => {
@@ -81,11 +94,23 @@ export const LikesProvider = ({ children }) => {
     return likeMap[productId] || { liked: false, count: Number(fallbackCount) || 0 };
   };
 
+  const seedLikeState = (productId, fallbackCount = 0) => {
+    if (!productId) return;
+    setLikeMap((prev) => {
+      if (prev[productId]) return prev;
+      return {
+        ...prev,
+        [productId]: { liked: false, count: Number(fallbackCount) || 0 }
+      };
+    });
+  };
+
   const value = useMemo(
     () => ({
       likeMap,
       toggleLike,
-      getLikeState
+      getLikeState,
+      seedLikeState
     }),
     [likeMap]
   );

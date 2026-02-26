@@ -18,6 +18,10 @@ def _serialize_product(product):
         product['created_at'] = product['created_at'].isoformat()
     if 'updated_at' in product:
         product['updated_at'] = product['updated_at'].isoformat()
+    if 'liked_by' in product:
+        product.pop('liked_by', None)
+    if 'likes_count' not in product:
+        product['likes_count'] = 0
     return product
 
 # Get all products with filtering, sorting, and pagination
@@ -293,5 +297,55 @@ def get_product_with_style_match(product_id):
             'style_match': style_match
         })
         
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@product_bp.route('/<product_id>/like', methods=['POST'])
+@jwt_required()
+def toggle_like(product_id):
+    try:
+        current_user_id = get_jwt_identity()
+        product_oid = ObjectId(product_id)
+        user_oid = ObjectId(current_user_id)
+
+        product = product_bp.mongo.db.products.find_one({'_id': product_oid})
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+
+        liked_by = product.get('liked_by', [])
+        already_liked = user_oid in liked_by
+
+        if already_liked:
+            product_bp.mongo.db.products.update_one(
+                {'_id': product_oid},
+                {
+                    '$pull': {'liked_by': user_oid},
+                    '$inc': {'likes_count': -1},
+                    '$set': {'updated_at': datetime.datetime.utcnow()}
+                }
+            )
+        else:
+            product_bp.mongo.db.products.update_one(
+                {'_id': product_oid},
+                {
+                    '$addToSet': {'liked_by': user_oid},
+                    '$inc': {'likes_count': 1},
+                    '$set': {'updated_at': datetime.datetime.utcnow()}
+                }
+            )
+
+        updated = product_bp.mongo.db.products.find_one({'_id': product_oid}) or {}
+        likes_count = max(0, int(updated.get('likes_count', 0)))
+        is_liked = user_oid in (updated.get('liked_by', []) or [])
+
+        if likes_count != int(updated.get('likes_count', 0)):
+            product_bp.mongo.db.products.update_one({'_id': product_oid}, {'$set': {'likes_count': likes_count}})
+
+        return jsonify({
+            'product_id': product_id,
+            'liked': is_liked,
+            'likes_count': likes_count
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

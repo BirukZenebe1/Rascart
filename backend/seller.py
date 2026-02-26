@@ -202,6 +202,10 @@ def get_seller_products():
         for product in products:
             product['_id'] = str(product['_id'])
             product['seller_id'] = str(product['seller_id'])
+            if 'liked_by' in product:
+                product.pop('liked_by', None)
+            if 'likes_count' not in product:
+                product['likes_count'] = 0
             if 'created_at' in product:
                 product['created_at'] = product['created_at'].isoformat()
             if 'updated_at' in product:

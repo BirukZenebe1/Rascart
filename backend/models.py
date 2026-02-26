@@ -114,7 +114,9 @@ def create_product(
         "created_at": datetime.now(),
         "updated_at": datetime.now(),
         "views": 0,
-        "sales_count": 0
+        "sales_count": 0,
+        "likes_count": 0,
+        "liked_by": []
     }
 
 def create_style_profile(user_id, preferences=None, ai_analysis=None, style_board=None):

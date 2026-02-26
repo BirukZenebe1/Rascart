@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { apiUrl } from '../../config';
+import { useLikes } from '../../context/LikesContext';
 
 function SellerProductsPage() {
   const location = useLocation();
+  const likes = useLikes();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,6 +15,12 @@ function SellerProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    products.forEach((product) => {
+      likes?.seedLikeState(product._id, Number(product.likes_count || 0));
+    });
+  }, [likes, products]);
 
   const fetchProducts = async () => {
     try {
@@ -97,6 +105,33 @@ function SellerProductsPage() {
     }
   };
 
+  const handleLike = async (event, product) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await likes?.toggleLike(product._id, Number(product.likes_count || 0));
+  };
+
+  const handleShare = async (event, product) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const productLink = `/product/${product._id}`;
+    const shareUrl = `${window.location.origin}${productLink}`;
+    const payload = {
+      title: product.name,
+      text: `Check out ${product.name} on merkatoAI`,
+      url: shareUrl
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(payload);
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+    } catch (err) {
+      // dismissed
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 min-h-[420px]">
@@ -175,14 +210,24 @@ function SellerProductsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Sales
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Likes
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {monitoredProducts.map((product) => (
-                <tr key={product._id}>
+              {monitoredProducts.map((product) => {
+                const likeState = likes?.getLikeState(product._id, Number(product.likes_count || 0)) || {
+                  liked: false,
+                  count: Number(product.likes_count || 0)
+                };
+                const liked = Boolean(likeState.liked);
+                const likeCount = Number(likeState.count || 0);
+                return (
+                  <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {product.image_url ? (
@@ -248,7 +293,37 @@ function SellerProductsPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {product.sales_count || 0}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <button
+                      onClick={(event) => handleLike(event, product)}
+                      className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors ${
+                        liked
+                          ? 'border-rose-300 bg-rose-50 text-rose-700'
+                          : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <svg
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${liked ? 'scale-110' : 'scale-100'}`}
+                        viewBox="0 0 24 24"
+                        fill={liked ? 'currentColor' : 'none'}
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L4.22 13.45 12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                      {likeCount}
+                    </button>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={(event) => handleShare(event, product)}
+                      className="text-slate-700 hover:text-slate-900 mr-4"
+                    >
+                      Share
+                    </button>
                     <Link
                       to={`/seller/products/edit/${product._id}`}
                       className="text-blue-600 hover:text-blue-900 mr-4"
@@ -262,8 +337,9 @@ function SellerProductsPage() {
                       Delete
                     </button>
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

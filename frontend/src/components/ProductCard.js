@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLikes } from '../context/LikesContext';
@@ -39,11 +39,11 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const handleLike = (event) => {
+  const handleLike = async (event) => {
     event.preventDefault();
     event.stopPropagation();
     if (!productId) return;
-    likes?.toggleLike(productId, Number(product.likes_count || 0));
+    await likes?.toggleLike(productId, Number(product.likes_count || 0));
   };
 
   const handleShare = async (event) => {
@@ -126,3 +126,6 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
+  useEffect(() => {
+    likes?.seedLikeState(productId, Number(product.likes_count || 0));
+  }, [likes, productId, product.likes_count]);
