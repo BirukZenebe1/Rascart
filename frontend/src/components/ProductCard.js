@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
@@ -8,6 +8,17 @@ const ProductCard = ({ product }) => {
   const productId = product._id || product.id;
   const productLink = productId ? `/product/${productId}` : '/shop';
   const isInCart = !!cart?.cartItems?.some((item) => (item._id || item.id) === productId);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(Number(product.likes_count || 0));
+
+  useEffect(() => {
+    if (!productId) return;
+    const saved = JSON.parse(localStorage.getItem('productLikes') || '{}');
+    if (saved[productId]) {
+      setLiked(Boolean(saved[productId].liked));
+      setLikeCount(Number(saved[productId].count || 0));
+    }
+  }, [productId]);
 
   const handleAddToCart = (event) => {
     event.preventDefault();
@@ -31,6 +42,37 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  const handleLike = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!productId) return;
+
+    const nextLiked = !liked;
+    const nextCount = Math.max(0, likeCount + (nextLiked ? 1 : -1));
+    setLiked(nextLiked);
+    setLikeCount(nextCount);
+
+    const saved = JSON.parse(localStorage.getItem('productLikes') || '{}');
+    saved[productId] = { liked: nextLiked, count: nextCount };
+    localStorage.setItem('productLikes', JSON.stringify(saved));
+  };
+
+  const handleShare = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const shareUrl = `${window.location.origin}${productLink}`;
+    const sharePayload = { title: product.name, text: `Check out ${product.name} on merkatoAI`, url: shareUrl };
+    try {
+      if (navigator.share) {
+        await navigator.share(sharePayload);
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+    } catch (err) {
+      // user dismissed share; no action needed
+    }
+  };
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <Link to={productLink} className="block">
@@ -46,16 +88,36 @@ const ProductCard = ({ product }) => {
       </Link>
       <div className="mt-4">
         {!isSeller && (
-          <button
-            onClick={handleAddToCart}
-            className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-              isInCart
-                ? 'btn-cart btn-cart-added'
-                : 'btn-cart'
-            }`}
-          >
-            {isInCart ? 'Added to Cart' : 'Add to Cart'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleAddToCart}
+              className={`flex-1 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                isInCart
+                  ? 'btn-cart btn-cart-added'
+                  : 'btn-cart'
+              }`}
+            >
+              {isInCart ? 'Added to Cart' : 'Add to Cart'}
+            </button>
+            <button
+              onClick={handleLike}
+              className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-md border text-sm font-semibold transition-colors ${
+                liked
+                  ? 'border-rose-300 bg-rose-50 text-rose-700'
+                  : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+              title="Like"
+            >
+              ❤ <span>{likeCount}</span>
+            </button>
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center justify-center px-3 py-2 rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 text-sm font-semibold transition-colors"
+              title="Share"
+            >
+              Share
+            </button>
+          </div>
         )}
       </div>
     </div>
