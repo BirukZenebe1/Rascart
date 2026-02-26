@@ -139,14 +139,6 @@ a[class*="bg-emerald-600"]:hover {
   }
 }
 
-.home-orbit-item {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  opacity: 0.32;
-  animation: home-orbit-drift 8s ease-in-out infinite;
-}
-
 .home-hero-stage {
   position: relative;
   min-height: 420px;
@@ -161,78 +153,180 @@ a[class*="bg-emerald-600"]:hover {
 
 .home-glow {
   position: absolute;
-  width: 230px;
-  height: 230px;
+  width: 280px;
+  height: 280px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.42), rgba(14, 116, 144, 0.05));
-  top: 55%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.4), rgba(14, 116, 144, 0.04));
+  top: 52%;
   left: 50%;
   transform: translate(-50%, -50%);
   animation: home-pulse 3s ease-in-out infinite;
 }
 
-.home-model {
+.home-fit-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(14, 116, 144, 0.28);
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(224, 242, 254, 0.62));
+  box-shadow: 0 18px 32px rgba(8, 145, 178, 0.14);
+  padding: 1rem 1.1rem;
+  text-align: center;
+  z-index: 2;
+}
+
+.home-fit-overline {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #155e75;
+}
+
+.home-fit-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.45rem;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.home-fit-subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.home-fashion-grid {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform-style: preserve-3d;
 }
 
-.home-animal {
-  font-size: 7rem;
-  transform: translateZ(45px);
-  filter: drop-shadow(0 18px 20px rgba(15, 23, 42, 0.2));
-}
-
-.home-outfit,
-.home-shoes,
-.home-accessory {
+.home-piece-card {
   position: absolute;
-  font-size: 2.2rem;
-  filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.2));
+  width: 120px;
+  border-radius: 0.95rem;
+  padding: 0.35rem;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.14);
+  animation: home-piece-float 5.5s ease-in-out infinite;
+  z-index: 3;
 }
 
-.home-outfit {
-  top: 42%;
-  left: 50%;
-  transform: translate(-50%, -50%) translateZ(54px);
+.home-piece-1 {
+  top: 12%;
+  left: 8%;
 }
 
-.home-shoes {
-  top: 65%;
-  left: 50%;
-  transform: translate(-50%, -50%) translateZ(44px);
+.home-piece-2 {
+  top: 14%;
+  right: 10%;
 }
 
-.home-accessory {
-  top: 30%;
-  left: 57%;
-  transform: translate(-50%, -50%) translateZ(50px);
+.home-piece-3 {
+  bottom: 13%;
+  left: 9%;
+}
+
+.home-piece-4 {
+  bottom: 12%;
+  right: 9%;
+}
+
+.home-piece-image {
+  width: 100%;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 0.7rem;
+}
+
+.home-piece-label {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .home-vibe {
   position: absolute;
   left: 50%;
-  bottom: 1.1rem;
+  bottom: 1rem;
   transform: translateX(-50%);
   background: rgba(15, 23, 42, 0.84);
   color: #f8fafc;
-  padding: 0.4rem 0.9rem;
+  padding: 0.38rem 0.88rem;
   border-radius: 999px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   letter-spacing: 0.04em;
 }
 
-@keyframes home-orbit-drift {
-  0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-  50% { transform: translate(-50%, -50%) translateY(-16px); }
+@keyframes home-piece-float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-0.8deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.8deg);
+  }
 }
 
 @keyframes home-pulse {
   0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
   50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+@media (max-width: 1024px) {
+  .home-piece-card {
+    width: 104px;
+  }
+
+  .home-piece-image {
+    height: 74px;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-hero-stage {
+    min-height: 520px;
+  }
+
+  .home-fit-core {
+    width: 78%;
+    top: 50%;
+  }
+
+  .home-piece-card {
+    width: 112px;
+  }
+
+  .home-piece-1 {
+    top: 8%;
+    left: 6%;
+  }
+
+  .home-piece-2 {
+    top: 8%;
+    right: 6%;
+  }
+
+  .home-piece-3 {
+    bottom: 8%;
+    left: 6%;
+  }
+
+  .home-piece-4 {
+    bottom: 8%;
+    right: 6%;
+  }
 }
 
 .home-brand-showcase {

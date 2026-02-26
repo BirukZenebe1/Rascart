@@ -1,14 +1,45 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const looks = [
-  { animal: '🦊', outfit: '🧥', shoes: '👟', accessory: '🕶️', vibe: 'Urban Fox Fit' },
-  { animal: '🐼', outfit: '🧣', shoes: '👢', accessory: '🎒', vibe: 'Cozy Panda Layer' },
-  { animal: '🐯', outfit: '🧢', shoes: '🥾', accessory: '⌚', vibe: 'Tiger Street Mode' },
-  { animal: '🐨', outfit: '🧶', shoes: '👞', accessory: '👜', vibe: 'Koala Smart Casual' }
+  {
+    vibe: 'Executive Edge',
+    pieces: [
+      { label: 'Tailored Jacket', image: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Luxury Watch', image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Leather Bag', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Premium Sneakers', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80' }
+    ]
+  },
+  {
+    vibe: 'Street Luxe',
+    pieces: [
+      { label: 'Graphic Hoodie', image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Minimal Cap', image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Crossbody Bag', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Chunky Trainers', image: 'https://images.unsplash.com/photo-1608666634759-4376010f863d?auto=format&fit=crop&w=600&q=80' }
+    ]
+  },
+  {
+    vibe: 'Sport Elite',
+    pieces: [
+      { label: 'Performance Top', image: 'https://images.unsplash.com/photo-1518459031867-a89b944bffe4?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Training Shoes', image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Sport Watch', image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Gym Duffle', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80' }
+    ]
+  },
+  {
+    vibe: 'Weekend Modern',
+    pieces: [
+      { label: 'Soft Knit', image: 'https://images.unsplash.com/photo-1619785292559-77fe3f6d2fca?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Neutral Tote', image: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Slim Denim', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80' },
+      { label: 'Casual Loafers', image: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=600&q=80' }
+    ]
+  }
 ];
 
-const orbitItems = ['👗', '👔', '👜', '👠', '🧥', '🧢', '💎', '🛍️'];
 const brandRows = [
   {
     speedClass: 'home-brand-track-forward',
@@ -46,20 +77,9 @@ function HomePage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setLookIndex((prev) => (prev + 1) % looks.length);
-    }, 2800);
+    }, 3400);
     return () => clearInterval(interval);
   }, []);
-
-  const floatingOrbits = useMemo(
-    () =>
-      orbitItems.map((item, index) => ({
-        item,
-        left: `${15 + (index % 4) * 22}%`,
-        top: `${20 + Math.floor(index / 4) * 42}%`,
-        delay: `${index * 0.4}s`
-      })),
-    []
-  );
 
   const handleMouseMove = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -71,18 +91,6 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-cyan-50 to-slate-100">
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          {floatingOrbits.map((entry) => (
-            <span
-              key={entry.item + entry.left}
-              className="home-orbit-item"
-              style={{ left: entry.left, top: entry.top, animationDelay: entry.delay }}
-            >
-              {entry.item}
-            </span>
-          ))}
-        </div>
-
         <div className="container mx-auto px-4 py-16 md:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -118,13 +126,23 @@ function HomePage() {
                 }}
               >
                 <div className="home-glow" />
-                <div className="home-model">
-                  <span className="home-animal">{currentLook.animal}</span>
-                  <span className="home-outfit">{currentLook.outfit}</span>
-                  <span className="home-shoes">{currentLook.shoes}</span>
-                  <span className="home-accessory">{currentLook.accessory}</span>
+                <div className="home-fit-core">
+                  <p className="home-fit-overline">AI Fit Composer</p>
+                  <p className="home-fit-title">{currentLook.vibe}</p>
+                  <p className="home-fit-subtitle">Live accessories and apparel rotation</p>
                 </div>
-                <div className="home-vibe">{currentLook.vibe}</div>
+                <div className="home-fashion-grid">
+                  {currentLook.pieces.map((piece, index) => (
+                    <div
+                      key={`${currentLook.vibe}-${piece.label}`}
+                      className={`home-piece-card home-piece-${index + 1}`}
+                      style={{ animationDelay: `${index * 0.25}s` }}
+                    >
+                      <img src={piece.image} alt={piece.label} className="home-piece-image" loading="lazy" />
+                      <span className="home-piece-label">{piece.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="mt-5 flex items-center gap-2">

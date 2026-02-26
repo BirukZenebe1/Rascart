@@ -93,6 +93,10 @@ function ProfilePage() {
     user?.is_personalized ||
     user?.personalization_state === 'personalized' ||
     Boolean(user?.style_profile);
+  const getOrderItemImage = (item) =>
+    item?.imageUrl ||
+    item?.image_url ||
+    'https://placehold.co/64x64/e2e8f0/1e293b?text=Item';
 
   if (loading) {
     return (
@@ -292,12 +296,21 @@ function ProfilePage() {
                 <ul className="space-y-4">
                   {orders.slice(0, 5).map((order) => (
                     <li key={order._id} className="border border-slate-200 rounded-xl p-4">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-900">Order {order._id}</span>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-semibold text-slate-900">Order #{String(order._id).slice(-8).toUpperCase()}</span>
                         <span className="text-sm text-slate-500">{new Date(order.created_at).toLocaleDateString()}</span>
                       </div>
-                      <div className="text-sm text-slate-600 mt-2">
-                        {order.items?.length || 0} items • ${Number(order.total).toFixed(2)}
+                      <div className="space-y-2">
+                        {(order.items || []).map((item, index) => (
+                          <div key={`${order._id}-${index}`} className="flex items-center gap-3">
+                            <img
+                              src={getOrderItemImage(item)}
+                              alt={item?.name || 'Product'}
+                              className="w-10 h-10 rounded-md object-cover border border-slate-200"
+                            />
+                            <div className="text-sm font-medium text-slate-700 truncate">{item?.name || 'Product'}</div>
+                          </div>
+                        ))}
                       </div>
                     </li>
                   ))}
