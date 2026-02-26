@@ -108,7 +108,19 @@ const ProductCard = ({ product }) => {
               }`}
               title="Like"
             >
-              ❤ <span>{likeCount}</span>
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${liked ? 'scale-110' : 'scale-100'}`}
+                viewBox="0 0 24 24"
+                fill={liked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L4.22 13.45 12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              <span>{likeCount}</span>
             </button>
             <button
               onClick={handleShare}
