@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { apiUrl } from '../config';
 
@@ -105,15 +105,12 @@ export const LikesProvider = ({ children }) => {
     });
   };
 
-  const value = useMemo(
-    () => ({
-      likeMap,
-      toggleLike,
-      getLikeState,
-      seedLikeState
-    }),
-    [likeMap]
-  );
+  const value = {
+    likeMap,
+    toggleLike,
+    getLikeState,
+    seedLikeState
+  };
 
   return <LikesContext.Provider value={value}>{children}</LikesContext.Provider>;
 };
