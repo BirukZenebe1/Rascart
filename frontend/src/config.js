@@ -3,8 +3,7 @@ const rawEnvBase =
   process.env.REACT_APP_API_URL ||
   '';
 const envApiBase = rawEnvBase.replace(/\/$/, '');
-const isNetlifyHost = typeof window !== 'undefined' && window.location.hostname.includes('netlify.app');
-const fallbackApiBase = isNetlifyHost ? 'https://merkato-ai.onrender.com' : '';
+const fallbackApiBase = '';
 
 export const API_BASE_URL = envApiBase || fallbackApiBase;
 

@@ -1,85 +1,70 @@
-# Overview
-This project focuses on building an AI-powered recommendation system for an online shopping platform. The goal is to personalize product suggestions based on user behavior and improve overall user experience.
-# Key Features
-User–item interaction modeling
-Personalized product recommendations
-Scalable and modular system design
-# Technologies
-Python
-Machine Learning
-Data preprocessing and modeling techniques
+# Rascart
 
-# Deployment (Render, Low Cost)
-This repo is prepared for Render using Docker:
-- `Dockerfile` builds the React frontend and serves it from Flask.
-- `render.yaml` defines a single web service named `merkato-ai`.
+Rascart is an AI-powered ecommerce experience that personalizes product discovery through a style profiling workflow.
+This project demonstrates full-stack product thinking: onboarding, recommendation logic, catalog exploration, cart, and checkout flow.
 
-## Steps
-1. Push this repo to GitHub.
-2. In Render, choose **New +** -> **Blueprint** and select this repo.
-3. Set environment variables in Render:
-   - `MONGO_URI`
-   - `JWT_SECRET_KEY`
-4. Deploy.
+## What This Project Demonstrates
 
-## Custom Domain
-Domain labels cannot contain spaces, so use a valid domain like:
-- `merkatoai.com`
-- `merkato.ai`
+- AI-assisted personalization for shopping recommendations
+- End-to-end user journey with authentication and protected routes
+- Product catalog filtering, sorting, and pagination
+- Modular React frontend + Flask backend architecture
 
-Then in Render service settings:
-1. Open **Custom Domains**.
-2. Add your purchased domain.
-3. Point DNS records at Render targets shown in the dashboard.
+## Tech Stack
 
-# Netlify Frontend (Free) + Render Backend
-You can host the React frontend on Netlify free tier and keep Flask API on Render.
+- Frontend: React, React Router, Tailwind CSS, Axios
+- Backend: Flask, Python
+- Auth: Token-based authentication
+- Data Layer: Product and user profile models
 
-## Netlify setup
-1. Connect `BirukZenebe1/GebeyaAI` in Netlify.
-2. Netlify will use `netlify.toml` from repo root:
-   - Base: `frontend`
-   - Build: `npm run build`
-   - Publish: `frontend/build`
-3. Deploy.
+## Repository Structure
 
-`netlify.toml` already includes:
-- SPA route fallback (`/* -> /index.html`)
-- API proxy (`/api/* -> https://merkato-ai.onrender.com/api/:splat`)
+- `/frontend` React web application
+- `/backend` Flask API, models, auth, and recommendation-related logic
 
-# AWS Lambda Backend Deployment
-This repo is prepared to deploy the backend with:
-- AWS Lambda
-- API Gateway (HTTP API)
-- CloudWatch Logs
-- IAM role (created by SAM)
+## Local Setup
 
-Files added:
-- `template.yaml`
-- `samconfig.toml`
-- `backend/lambda_handler.py`
-
-## Prerequisites
-1. AWS CLI configured (`aws configure`)
-2. AWS SAM CLI installed
-3. Docker installed (for `sam build --use-container`)
-
-## Deploy
-From repo root:
+### 1. Clone
 
 ```bash
-sam build --use-container
-sam deploy \
-  --parameter-overrides \
-  MongoUri='YOUR_MONGO_URI' \
-  JwtSecretKey='YOUR_JWT_SECRET_KEY' \
-  OpenAIApiKey='YOUR_OPENAI_API_KEY_OR_EMPTY'
+git clone https://github.com/BirukZenebe1/GebeyaAI.git
+cd GebeyaAI
 ```
 
-After deploy, SAM prints `ApiUrl` output.
+### 2. Backend
 
-## Point frontend to AWS backend
-In Netlify environment variables, set:
-- `REACT_APP_API_BASE_URL=https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com`
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
 
-Then redeploy Netlify frontend.
+Backend runs on `http://localhost:5001`.
+
+### 3. Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Frontend runs on `http://localhost:3000`.
+
+## Core User Flow
+
+1. Register or login.
+2. Complete the style questionnaire.
+3. Receive AI-driven style analysis.
+4. Browse personalized products.
+5. Add to cart and complete checkout.
+
+## Portfolio Notes
+
+This project is suitable as a portfolio piece for:
+
+- Full-stack development roles
+- AI product engineering roles
+- Ecommerce personalization and recommendation-focused roles

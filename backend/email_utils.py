@@ -4,7 +4,7 @@ import boto3
 def send_email(to_address, subject, body_text, body_html=None):
     region = os.environ.get("SES_REGION", "eu-central-1")
     from_address = os.environ.get("SES_FROM_EMAIL")
-    from_name = (os.environ.get("SES_FROM_NAME") or "merkatoAI").strip()
+    from_name = (os.environ.get("SES_FROM_NAME") or "Rascart").strip()
     reply_to = (os.environ.get("SES_REPLY_TO") or from_address or "").strip()
     if not from_address:
         raise RuntimeError("SES_FROM_EMAIL is required")

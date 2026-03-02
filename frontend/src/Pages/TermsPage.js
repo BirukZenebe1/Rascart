@@ -10,7 +10,7 @@ function TermsPage() {
 
           <div className="space-y-4 text-slate-700 leading-relaxed">
             <p>
-              By using merkatoAI, you agree to these terms. If you do not agree, do not use the platform.
+              By using Rascart, you agree to these terms. If you do not agree, do not use the platform.
             </p>
             <p>
               Accounts must be registered with accurate information. You are responsible for keeping your
@@ -25,7 +25,7 @@ function TermsPage() {
               selected at checkout. We may update or discontinue features at any time.
             </p>
             <p>
-              merkatoAI may suspend or terminate accounts that violate these terms, misuse the service,
+              Rascart may suspend or terminate accounts that violate these terms, misuse the service,
               or engage in fraudulent activity.
             </p>
             <p>

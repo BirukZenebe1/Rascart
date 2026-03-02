@@ -54,7 +54,7 @@ const ProductCard = ({ product }) => {
     event.preventDefault();
     event.stopPropagation();
     const shareUrl = `${window.location.origin}${productLink}`;
-    const sharePayload = { title: product.name, text: `Check out ${product.name} on merkatoAI`, url: shareUrl };
+    const sharePayload = { title: product.name, text: `Check out ${product.name} on Rascart`, url: shareUrl };
     try {
       if (navigator.share) {
         await navigator.share(sharePayload);

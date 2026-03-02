@@ -11,8 +11,8 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2">
-              <img src={basketLogo} alt="merkatoAI logo" className="h-8 w-8" />
-              <h3 className="text-2xl font-black text-white">merkato<span className="text-cyan-400">AI</span></h3>
+              <img src={basketLogo} alt="Rascart logo" className="h-8 w-8" />
+              <h3 className="text-2xl font-black text-white">Rascart</h3>
             </div>
             <p className="text-slate-400 mt-3 text-sm leading-6">
               AI-powered e-commerce platform for personalized shopping, trusted sellers, and seamless checkout.
@@ -49,7 +49,7 @@ function Footer() {
         </div>
 
         <div className="border-t border-slate-800 mt-10 pt-6 text-sm text-slate-400 flex flex-col md:flex-row md:justify-between gap-2">
-          <p>© {year} merkatoAI. All rights reserved.</p>
+          <p>© {year} Rascart. All rights reserved.</p>
           <p>Built for modern e-commerce experiences.</p>
         </div>
       </div>

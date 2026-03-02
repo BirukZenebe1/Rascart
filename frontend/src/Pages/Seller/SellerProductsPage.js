@@ -118,7 +118,7 @@ function SellerProductsPage() {
     const shareUrl = `${window.location.origin}${productLink}`;
     const payload = {
       title: product.name,
-      text: `Check out ${product.name} on merkatoAI`,
+      text: `Check out ${product.name} on Rascart`,
       url: shareUrl
     };
     try {

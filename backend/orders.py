@@ -134,7 +134,7 @@ def create_order_route():
             item_lines.append(f"- {item_name} x{qty}: ${price * qty:.2f}")
 
         if recipient_email:
-            subject = "merkatoAI Order Confirmation"
+            subject = "Rascart Order Confirmation"
             body = (
                 f"Hi {user.get('username', 'there') if user else 'there'},\n\n"
                 f"Your order has been confirmed successfully.\n\n"
@@ -146,7 +146,7 @@ def create_order_route():
                 f"Total Paid: ${float(total):.2f}\n\n"
                 f"Items:\n" + "\n".join(item_lines) + "\n\n"
                 f"We will notify sellers right away.\n"
-                f"Thank you for shopping on merkatoAI."
+                f"Thank you for shopping on Rascart."
             )
             try:
                 send_email(recipient_email, subject, body)
@@ -172,7 +172,7 @@ def create_order_route():
                 seller_subject = f"New Order Received | {order_id}"
                 seller_body = (
                     f"Hi {seller.get('username', 'Seller')},\n\n"
-                    f"You received a new order on merkatoAI.\n\n"
+                    f"You received a new order on Rascart.\n\n"
                     f"Order ID: {order_id}\n"
                     f"Order Date: {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n"
                     f"Buyer: {user.get('username', 'Customer') if user else 'Customer'}\n"
