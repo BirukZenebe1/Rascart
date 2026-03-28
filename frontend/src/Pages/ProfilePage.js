@@ -15,8 +15,30 @@ function ProfilePage() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login', { state: { from: '/profile', message: 'Please login first to continue.' } });
+          return;
+        }
+        const response = await axios.get(apiUrl('/api/auth/profile'), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(response.data.user);
+        setLoading(false);
+      } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          navigate('/login', { state: { from: '/profile', message: 'Please login first to continue.' } });
+          return;
+        }
+        setError('Failed to fetch profile');
+        setLoading(false);
+      }
+    };
+
     fetchUserProfile();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -33,28 +55,6 @@ function ProfilePage() {
     };
     fetchOrders();
   }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login', { state: { from: '/profile', message: 'Please login first to continue.' } });
-        return;
-      }
-      const response = await axios.get(apiUrl('/api/auth/profile'), {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(response.data.user);
-      setLoading(false);
-    } catch (err) {
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        navigate('/login', { state: { from: '/profile', message: 'Please login first to continue.' } });
-        return;
-      }
-      setError('Failed to fetch profile');
-      setLoading(false);
-    }
-  };
 
   const handlePhotoUpdate = (newPhotoPath) => {
     setUser({ ...user, profile_photo: newPhotoPath });
