@@ -263,6 +263,12 @@ function RegisterPage() {
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
+          <p className="text-center text-sm text-slate-600">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-cyan-700 hover:text-cyan-900">
+              Sign in
+            </Link>
+          </p>
 
           </form>
         ) : (

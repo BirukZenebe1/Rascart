@@ -100,8 +100,7 @@ function Navbar() {
                 Shop
               </Link>
               <Link to="/about" className="text-slate-700 hover:text-cyan-700 font-medium">About</Link>
-              <Link to="/login" className="text-slate-700 hover:text-cyan-700 font-medium">Login</Link>
-              <Link to="/register" className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors">Register</Link>
+              <Link to="/login" className="text-slate-700 hover:text-cyan-700 font-medium">Sign in</Link>
             </>
           )}
         </div>

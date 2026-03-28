@@ -9,8 +9,8 @@ function SupportPage() {
           <p className="text-slate-600 mb-6">Need help? We respond within 24 hours.</p>
 
           <div className="space-y-4 text-slate-700">
-            <p>Email: support@rascart.com</p>
-            <p>WhatsApp: +251-900-000-000</p>
+            <p>Email: hello@rascart.com</p>
+            <p>WhatsApp: +48452580406</p>
             <p>Business Hours: 9am–6pm (EAT)</p>
           </div>
         </div>

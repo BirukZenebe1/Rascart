@@ -85,8 +85,9 @@ function StyleQuestionnaire() {
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const { token, refreshUser, setUser } = useAuth();
+  const { token: authToken, refreshUser, setUser } = useAuth();
   const navigate = useNavigate();
+  const token = authToken || localStorage.getItem('token');
 
   useEffect(() => {
     const loadExistingProfile = async () => {
@@ -133,22 +134,36 @@ function StyleQuestionnaire() {
     setIsSubmitting(true);
     setError('');
     try {
+      if (!token) {
+        setError('Please sign in to save your style profile.');
+        setIsSubmitting(false);
+        return;
+      }
       // Configure axios with auth token
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       };
+      const payloadAnswers = { ...answers };
       // Send preferences to backend
       const response = await axios.post(
         apiUrl('/api/style/profile'),
-        { preferences: answers },
+        { preferences: payloadAnswers },
         config
       );
 
       // Ensure auth context reflects latest persisted personalization state.
-      const updatedUser = await refreshUser(token);
-      if (!updatedUser) {
+      try {
+        const updatedUser = await refreshUser(token);
+        if (!updatedUser) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            personalization_state: 'personalized',
+            is_personalized: true
+          }));
+        }
+      } catch (refreshError) {
         setUser((prevUser) => ({
           ...prevUser,
           personalization_state: 'personalized',
@@ -159,7 +174,7 @@ function StyleQuestionnaire() {
       navigate('/style-results', { 
         state: { 
           analysis: response.data.ai_analysis,
-          preferences: answers,
+          preferences: payloadAnswers,
           personalization_state: response.data.personalization_state || 'personalized'
         } 
       });

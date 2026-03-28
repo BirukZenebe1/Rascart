@@ -24,6 +24,9 @@ function ProductDetailPage() {
   const [chatText, setChatText] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const isInCart = !!cart?.cartItems?.some((item) => (item._id || item.id) === (product?._id || product?.id));
+  const availableStock = Number.isFinite(Number(product?.stock)) ? Number(product.stock) : null;
+  const maxQuantity = availableStock && availableStock > 0 ? availableStock : 1;
+  const isOutOfStock = availableStock === 0;
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -45,7 +48,7 @@ function ProductDetailPage() {
         } else {
           setProduct(response.data.product);
         }
-        
+
         setLoading(false);
       } catch (err) {
         setError('Failed to load product details');
@@ -56,6 +59,10 @@ function ProductDetailPage() {
     
     fetchProduct();
   }, [productId, token]);
+
+  useEffect(() => {
+    setQuantity((prev) => Math.min(Math.max(prev, 1), maxQuantity));
+  }, [maxQuantity]);
 
   useEffect(() => {
     const fetchSimilarProducts = async () => {
@@ -128,35 +135,38 @@ function ProductDetailPage() {
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
-    if (value > 0) {
-      setQuantity(value);
-    }
+    if (Number.isNaN(value)) return;
+    const nextValue = Math.min(Math.max(value, 1), maxQuantity);
+    setQuantity(nextValue);
   };
   
   const addToCart = () => {
+    if (isOutOfStock) return;
+    const safeQty = Math.min(quantity, maxQuantity);
     if (cart?.addToCart) {
-      cart.addToCart(product, quantity);
+      cart.addToCart(product, safeQty);
     } else {
       const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
       const existingItemIndex = savedCart.findIndex((item) => item._id === product._id);
       if (existingItemIndex !== -1) {
         savedCart[existingItemIndex] = {
           ...savedCart[existingItemIndex],
-          quantity: (savedCart[existingItemIndex].quantity || 0) + quantity
+          quantity: (savedCart[existingItemIndex].quantity || 0) + safeQty
         };
       } else {
-        savedCart.push({ ...product, quantity });
+        savedCart.push({ ...product, quantity: safeQty });
       }
       localStorage.setItem('cart', JSON.stringify(savedCart));
     }
   };
 
   const handleAddToCart = () => {
-    if (isInCart) return;
+    if (isInCart || isOutOfStock) return;
     addToCart();
   };
 
   const handleProceedToCheckout = () => {
+    if (isOutOfStock) return;
     if (!window.confirm('Proceed to checkout?')) {
       return;
     }
@@ -321,46 +331,112 @@ function ProductDetailPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
             <div className="flex items-center">
               <button 
-                onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                className="bg-slate-100 border border-slate-300 px-3 py-1 rounded-l-md"
+                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                disabled={quantity <= 1}
+                className="bg-slate-100 border border-slate-300 px-3 py-1 rounded-l-md disabled:opacity-50"
               >
                 -
               </button>
               <input
                 type="number"
                 min="1"
+                max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
                 className="w-16 text-center border-t border-b border-slate-300 py-1"
               />
               <button 
-                onClick={() => setQuantity(quantity + 1)}
-                className="bg-slate-100 border border-slate-300 px-3 py-1 rounded-r-md"
+                onClick={() => setQuantity((prev) => Math.min(maxQuantity, prev + 1))}
+                disabled={quantity >= maxQuantity}
+                className="bg-slate-100 border border-slate-300 px-3 py-1 rounded-r-md disabled:opacity-50"
               >
                 +
               </button>
             </div>
+            {availableStock !== null && (
+              <div className="mt-2 text-xs text-slate-500">
+                {isOutOfStock ? 'Out of stock' : `${availableStock} available`}
+              </div>
+            )}
           </div>
-          
+
+          {token && (
+            <div className="mt-6 border border-slate-200 rounded-xl p-4 bg-slate-50">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold text-slate-900">Chat with Seller</h2>
+                {isSeller && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/seller/chats')}
+                    className="text-cyan-700 font-semibold text-sm"
+                  >
+                    Open Chats
+                  </button>
+                )}
+              </div>
+              {isSeller ? (
+                <div className="text-sm text-slate-600">
+                  Sellers can reply from the Chats page.
+                </div>
+              ) : (
+                <>
+                  <div className="max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 space-y-2 bg-white mb-3">
+                    {thread?.messages?.length ? (
+                      thread.messages.map((msg, idx) => (
+                        <div key={idx} className="text-sm text-slate-700">
+                          <span className="font-semibold">
+                            {msg.sender_id === localStorage.getItem('userId') ? 'You' : 'Seller'}:
+                          </span>{' '}
+                          {msg.text}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-slate-500">No messages yet. Start a conversation.</div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={chatText}
+                      onChange={(e) => setChatText(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-slate-300 rounded-md"
+                      placeholder="Ask about availability, sizing, delivery..."
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSendMessage}
+                      disabled={chatLoading}
+                      className="px-4 py-2 bg-slate-900 text-white rounded-md"
+                    >
+                      {chatLoading ? 'Sending...' : 'Send'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {!isSeller && (
-            <>
+            <div className="mt-6 grid gap-3">
               <button
                 onClick={handleProceedToCheckout}
-                className="mt-6 w-full bg-cyan-600 text-white py-3 rounded-lg hover:bg-cyan-700 transition-colors font-semibold"
+                disabled={isOutOfStock}
+                className="w-full bg-cyan-600 text-white py-3 rounded-lg hover:bg-cyan-700 transition-colors font-semibold disabled:opacity-50"
               >
                 Proceed to Checkout
               </button>
               <button
                 onClick={handleAddToCart}
-                className={`mt-3 w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                disabled={isOutOfStock}
+                className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
                   isInCart
                     ? 'btn-cart btn-cart-added'
                     : 'btn-cart'
-                }`}
+                } ${isOutOfStock ? 'opacity-50' : ''}`}
               >
-                {isInCart ? 'Added to Cart' : 'Add to Cart'}
+                {isOutOfStock ? 'Sold Out' : (isInCart ? 'Added to Cart' : 'Add to Cart')}
               </button>
-            </>
+            </div>
           )}
           
           {/* Back to Shop */}
@@ -395,58 +471,6 @@ function ProductDetailPage() {
             </div>
           )}
         </div>
-        {token && (
-          <div className="mt-10 bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Chat with Seller</h2>
-            {isSeller ? (
-              <div className="text-slate-600">
-                Sellers can reply from the{' '}
-                <button
-                  type="button"
-                  onClick={() => navigate('/seller/chats')}
-                  className="text-cyan-700 font-semibold"
-                >
-                  Chats
-                </button>{' '}
-                page.
-              </div>
-            ) : (
-              <>
-                <div className="max-h-60 overflow-y-auto border border-slate-200 rounded-xl p-4 space-y-3 mb-4">
-                  {thread?.messages?.length ? (
-                    thread.messages.map((msg, idx) => (
-                      <div key={idx} className="text-sm text-slate-700">
-                        <span className="font-semibold">
-                          {msg.sender_id === localStorage.getItem('userId') ? 'You' : 'Seller'}:
-                        </span>{' '}
-                        {msg.text}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-slate-500">No messages yet. Start a conversation.</div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={chatText}
-                    onChange={(e) => setChatText(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md"
-                    placeholder="Ask about availability, sizing, delivery..."
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSendMessage}
-                    disabled={chatLoading}
-                    className="px-4 py-2 bg-slate-900 text-white rounded-md"
-                  >
-                    {chatLoading ? 'Sending...' : 'Send'}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
