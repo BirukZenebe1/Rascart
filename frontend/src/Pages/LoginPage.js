@@ -67,12 +67,6 @@ function LoginPage() {
           <h2 className="text-center text-3xl font-black text-slate-900">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-cyan-700 hover:text-cyan-900">
-              Register here
-            </Link>
-          </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

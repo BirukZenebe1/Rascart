@@ -98,18 +98,7 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    setAuthLoading(true);
-    try {
-      await axios.post(apiUrl('/api/auth/oauth/apple'), {
-        user_type: userType
-      });
-    } catch (error) {
-      onError?.(error.response?.data?.error || 'Apple sign-in failed');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+  // Apple sign-in is intentionally disabled until configured.
 
   return (
     <div className="space-y-3">
@@ -144,14 +133,7 @@ function SocialAuthButtons({ userType = 'buyer', onAuthSuccess, onError }) {
         </button>
       )}
 
-      <button
-        type="button"
-        onClick={handleAppleSignIn}
-        className="w-full inline-flex items-center justify-center gap-3 rounded-full border border-slate-900 bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
-        disabled={authLoading}
-      >
-        Continue with Apple
-      </button>
+      {/* Apple sign-in disabled until configured */}
     </div>
   );
 }

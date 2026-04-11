@@ -114,12 +114,6 @@ function RegisterPage() {
           <h2 className="text-center text-3xl font-black text-slate-900">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-cyan-700 hover:text-cyan-900">
-              Sign in
-            </Link>
-          </p>
         </div>
 
         {!verificationStep ? (
