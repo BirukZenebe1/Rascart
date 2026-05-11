@@ -57,7 +57,7 @@ const brandRows = [
   {
     speedClass: 'home-brand-track-fast',
     items: [
-      { name: 'GUCCI', textOnly: true, wordmarkClass: 'brand-wordmark-gucci' },
+      { name: 'CHANEL', textOnly: true, wordmarkClass: 'brand-wordmark-chanel' },
       { name: 'PRADA', textOnly: true, wordmarkClass: 'brand-wordmark-prada' },
       { name: 'Dior', logo: 'https://cdn.simpleicons.org/dior/0f172a' },
       { name: 'ZARA', textOnly: true, wordmarkClass: 'brand-wordmark-zara' },
