@@ -43,6 +43,13 @@ python app.py
 
 Backend runs on `http://localhost:5001`.
 
+Required backend environment variables:
+
+- `MONGO_URI`
+- `JWT_SECRET_KEY`
+- `OPENAI_API_KEY`
+- `CONTENT_MODERATION_REQUIRED=true`
+
 ### 3. Frontend
 
 ```bash

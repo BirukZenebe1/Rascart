@@ -5,6 +5,7 @@ import datetime
 import openai
 import os
 import traceback
+from content_moderation import ContentPolicyError, assert_payload_text_allowed
  
 # Initialize blueprint
 style_bp = Blueprint('style', __name__)
@@ -23,6 +24,10 @@ def create_or_update_profile():
         # Check if required fields are present
         if 'preferences' not in data:
             return jsonify({"error": "Missing preferences data"}), 400
+        try:
+            assert_payload_text_allowed(data.get('preferences'))
+        except ContentPolicyError as policy_error:
+            return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
 
         print(f"Received style preferences: {data['preferences']}")
         

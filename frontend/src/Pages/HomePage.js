@@ -59,8 +59,8 @@ const brandRows = [
     items: [
       { name: 'GUCCI', textOnly: true, wordmarkClass: 'brand-wordmark-gucci' },
       { name: 'PRADA', textOnly: true, wordmarkClass: 'brand-wordmark-prada' },
-      { name: 'Dior', logo: 'https://cdn.simpleicons.org/dior/0f172a' },
-      { name: 'Zara', logo: 'https://cdn.simpleicons.org/zara/0f172a' },
+      { name: 'DIOR', textOnly: true, wordmarkClass: 'brand-wordmark-dior' },
+      { name: 'ZARA', textOnly: true, wordmarkClass: 'brand-wordmark-zara' },
       { name: "Levi's", textOnly: true, wordmarkClass: 'brand-wordmark-levis' },
       { name: 'BURBERRY', textOnly: true, wordmarkClass: 'brand-wordmark-burberry' },
       { name: 'The North Face', logo: 'https://cdn.simpleicons.org/thenorthface/0f172a' },

@@ -3,8 +3,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import datetime
 import os
-import base64
 from models import create_product, create_seller_profile
+from content_moderation import ContentPolicyError, assert_content_allowed, assert_payload_text_allowed
+from image_utils import normalize_base64_image
 
 # Initialize blueprint
 seller_bp = Blueprint('seller', __name__)
@@ -12,30 +13,22 @@ MAX_PRODUCT_IMAGE_BYTES = 3 * 1024 * 1024
 
 def save_product_image(base64_string, filename_prefix='product', host_url=''):
     try:
+        normalized = normalize_base64_image(base64_string, MAX_PRODUCT_IMAGE_BYTES)
+        if not normalized:
+            return None
+
         if os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
-            if base64_string.startswith('data:'):
-                return base64_string
-            if 'base64,' in base64_string:
-                base64_string = base64_string.split('base64,')[1]
-            return f"data:image/png;base64,{base64_string}"
+            return normalized["data_url"]
 
         upload_folder = os.path.join(os.path.dirname(__file__), 'uploads', 'products')
         os.makedirs(upload_folder, exist_ok=True)
 
-        if 'base64,' in base64_string:
-            base64_string = base64_string.split('base64,')[1]
-        if not base64_string:
-            return None
-
-        image_data = base64.b64decode(base64_string)
-        if len(image_data) > MAX_PRODUCT_IMAGE_BYTES:
-            return None
         timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"{filename_prefix}_{timestamp}.png"
         filepath = os.path.join(upload_folder, filename)
 
         with open(filepath, 'wb') as file_handle:
-            file_handle.write(image_data)
+            file_handle.write(normalized["bytes"])
 
         return f"{host_url}api/auth/uploads/products/{filename}"
     except Exception:
@@ -52,6 +45,14 @@ def create_seller_profile_route():
         # Check required fields
         if 'business_name' not in data:
             return jsonify({"error": "Business name is required"}), 400
+        try:
+            assert_payload_text_allowed({
+                "business_name": data.get('business_name'),
+                "business_description": data.get('business_description'),
+                "phone": data.get('phone'),
+            })
+        except ContentPolicyError as policy_error:
+            return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
         
         # Check if user exists
         user = seller_bp.mongo.db.users.find_one({'_id': ObjectId(current_user_id)})
@@ -143,11 +144,34 @@ def add_product():
         required_fields = ['name', 'description', 'price', 'product_type', 'preferred_contact', 'payment_method']
         if not all(field in data for field in required_fields):
             return jsonify({"error": "Missing required fields"}), 400
+        if data.get('image_url') and not data.get('image_data'):
+            return jsonify({"error": "Please upload the product image instead of using an external image URL."}), 400
+
+        uploaded_image_data_url = None
+        if data.get('image_data'):
+            normalized_image = normalize_base64_image(data['image_data'], MAX_PRODUCT_IMAGE_BYTES)
+            if not normalized_image:
+                return jsonify({"error": "Invalid product image"}), 400
+            uploaded_image_data_url = normalized_image["data_url"]
+
+        try:
+            assert_payload_text_allowed({
+                "name": data.get('name'),
+                "description": data.get('description'),
+                "product_type": data.get('product_type'),
+                "preferred_contact": data.get('preferred_contact'),
+                "payment_method": data.get('payment_method'),
+                "categories": data.get('categories'),
+                "attributes": data.get('attributes'),
+            })
+            assert_content_allowed(image_data_urls=[uploaded_image_data_url] if uploaded_image_data_url else None)
+        except ContentPolicyError as policy_error:
+            return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
 
         image_url = data.get('image_url', '')
         if data.get('image_data'):
             uploaded_image_url = save_product_image(
-                data['image_data'],
+                uploaded_image_data_url,
                 filename_prefix=f"seller_{current_user_id}",
                 host_url=request.host_url
             )
@@ -241,6 +265,32 @@ def update_product(product_id):
             return jsonify({"error": "Product not found or unauthorized"}), 404
         
         data = request.get_json()
+        if (
+            data.get('image_url')
+            and data.get('image_url') != product.get('image_url')
+            and not data.get('image_data')
+        ):
+            return jsonify({"error": "Please upload the product image instead of using an external image URL."}), 400
+        uploaded_image_data_url = None
+        if data.get('image_data'):
+            normalized_image = normalize_base64_image(data['image_data'], MAX_PRODUCT_IMAGE_BYTES)
+            if not normalized_image:
+                return jsonify({"error": "Invalid product image"}), 400
+            uploaded_image_data_url = normalized_image["data_url"]
+
+        try:
+            assert_payload_text_allowed({
+                "name": data.get('name'),
+                "description": data.get('description'),
+                "product_type": data.get('product_type'),
+                "preferred_contact": data.get('preferred_contact'),
+                "payment_method": data.get('payment_method'),
+                "categories": data.get('categories'),
+                "attributes": data.get('attributes'),
+            })
+            assert_content_allowed(image_data_urls=[uploaded_image_data_url] if uploaded_image_data_url else None)
+        except ContentPolicyError as policy_error:
+            return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
         
         # Build update document
         update_fields = {}
@@ -260,7 +310,7 @@ def update_product(product_id):
 
         if data.get('image_data'):
             uploaded_image_url = save_product_image(
-                data['image_data'],
+                uploaded_image_data_url,
                 filename_prefix=f"seller_{current_user_id}",
                 host_url=request.host_url
             )

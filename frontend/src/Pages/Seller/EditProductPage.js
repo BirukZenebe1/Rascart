@@ -112,6 +112,7 @@ function EditProductPage() {
         image_url: ''
       });
       setImagePreview(optimized);
+      setImageConfirmed(false);
     } catch (uploadError) {
       setError('Failed to process image. Please try another file.');
     }
@@ -338,7 +339,7 @@ function EditProductPage() {
             </label>
             <input
               type="file"
-              accept="image/*"
+              accept="image/png,image/jpeg,image/webp,image/gif"
               onChange={handleImageUpload}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
             />
@@ -358,20 +359,6 @@ function EditProductPage() {
               />
               I confirm this image matches the product name
             </label>
-          </div>
-
-          {/* Image URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Or Image URL
-            </label>
-            <input
-              type="url"
-              name="image_url"
-              value={formData.image_url}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
           </div>
 
           {/* Active Status */}

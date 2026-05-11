@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
 import datetime
+from content_moderation import ContentPolicyError, assert_content_allowed
 from models import create_message_thread
 
 messages_bp = Blueprint('messages', __name__)
@@ -55,6 +56,10 @@ def send_message(product_id):
     text = (data.get('text') or '').strip()
     if not text:
         return jsonify({"error": "Message text required"}), 400
+    try:
+        assert_content_allowed(text_items=[text])
+    except ContentPolicyError as policy_error:
+        return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
 
     current_user_id = ObjectId(get_jwt_identity())
     product_oid = _safe_object_id(product_id)

@@ -403,6 +403,20 @@ a[class*="bg-emerald-600"]:hover {
   font-weight: 500;
 }
 
+.brand-wordmark-dior {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+}
+
+.brand-wordmark-zara {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 1.24rem;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
 .brand-wordmark-burberry {
   font-family: "Times New Roman", Georgia, serif;
   font-size: 1.06rem;

@@ -4,7 +4,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 import datetime
 from models import create_user
 from bson.objectid import ObjectId
-from image_utils import save_base64_image, delete_image
+from content_moderation import ContentPolicyError, assert_content_allowed, assert_payload_text_allowed
+from image_utils import save_base64_image, delete_image, normalize_base64_image
 from email_utils import send_email
 import os
 import random
@@ -98,6 +99,10 @@ def register():
             return jsonify({"error": "Missing required fields"}), 400
         if not data.get('terms_accepted'):
             return jsonify({"error": "You must accept the terms and conditions"}), 400
+        try:
+            assert_payload_text_allowed({"username": data.get('username')})
+        except ContentPolicyError as policy_error:
+            return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
         
         existing_user = auth_bp.mongo.db.users.find_one({'email': data['email']})
         if existing_user:
@@ -304,6 +309,10 @@ def update_profile():
             })
             if existing_username:
                 return jsonify({"error": "Username already taken"}), 409
+            try:
+                assert_payload_text_allowed({"username": username})
+            except ContentPolicyError as policy_error:
+                return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
             updates['username'] = username
 
         if 'email' in data and (data.get('email') or '').strip().lower() != (user.get('email') or '').strip().lower():
@@ -357,6 +366,14 @@ def upload_profile_photo():
         
         if not data or 'image' not in data:
             return jsonify({"error": "No image data provided"}), 400
+
+        normalized_image = normalize_base64_image(data['image'])
+        if not normalized_image:
+            return jsonify({"error": "Invalid image"}), 400
+        try:
+            assert_content_allowed(image_data_urls=[normalized_image["data_url"]])
+        except ContentPolicyError as policy_error:
+            return jsonify({"error": str(policy_error), "categories": policy_error.categories}), 400
         
         user = auth_bp.mongo.db.users.find_one({'_id': ObjectId(current_user_id)})
         if not user:
@@ -370,7 +387,7 @@ def upload_profile_photo():
             delete_image(old_photo_path)
         
         filename_prefix = f"user_{current_user_id}"
-        image_path = save_base64_image(data['image'], filename_prefix)
+        image_path = save_base64_image(normalized_image["data_url"], filename_prefix)
         
         if not image_path:
             return jsonify({"error": "Failed to save image"}), 500
