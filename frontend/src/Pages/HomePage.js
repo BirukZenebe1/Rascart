@@ -44,12 +44,12 @@ const brandRows = [
   {
     speedClass: 'home-brand-track-forward',
     items: [
-      { name: 'Nike', logo: 'https://cdn.simpleicons.org/nike/0f172a' },
-      { name: 'Adidas', logo: 'https://cdn.simpleicons.org/adidas/0f172a' },
-      { name: 'Puma', logo: 'https://cdn.simpleicons.org/puma/0f172a' },
-      { name: 'New Balance', logo: 'https://cdn.simpleicons.org/newbalance/0f172a' },
-      { name: 'Reebok', logo: 'https://cdn.simpleicons.org/reebok/0f172a' },
-      { name: 'Under Armour', logo: 'https://cdn.simpleicons.org/underarmour/0f172a' },
+      { name: 'NIKE', textOnly: true, wordmarkClass: 'brand-wordmark-nike' },
+      { name: 'adidas', textOnly: true, wordmarkClass: 'brand-wordmark-adidas' },
+      { name: 'PUMA', textOnly: true, wordmarkClass: 'brand-wordmark-puma' },
+      { name: 'New Balance', textOnly: true, wordmarkClass: 'brand-wordmark-new-balance' },
+      { name: 'Reebok', textOnly: true, wordmarkClass: 'brand-wordmark-reebok' },
+      { name: 'UNDER ARMOUR', textOnly: true, wordmarkClass: 'brand-wordmark-under-armour' },
       { name: 'ASICS', textOnly: true, wordmarkClass: 'brand-wordmark-asics' },
       { name: 'CONVERSE', textOnly: true, wordmarkClass: 'brand-wordmark-converse' }
     ]
@@ -63,8 +63,8 @@ const brandRows = [
       { name: 'ZARA', textOnly: true, wordmarkClass: 'brand-wordmark-zara' },
       { name: "Levi's", textOnly: true, wordmarkClass: 'brand-wordmark-levis' },
       { name: 'BURBERRY', textOnly: true, wordmarkClass: 'brand-wordmark-burberry' },
-      { name: 'The North Face', logo: 'https://cdn.simpleicons.org/thenorthface/0f172a' },
-      { name: 'Lululemon', logo: 'https://cdn.simpleicons.org/lululemon/0f172a' }
+      { name: 'The North Face', textOnly: true, wordmarkClass: 'brand-wordmark-north-face' },
+      { name: 'lululemon', textOnly: true, wordmarkClass: 'brand-wordmark-lululemon' }
     ]
   }
 ];
